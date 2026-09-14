@@ -6,6 +6,15 @@ import '../services/services.dart';
 import '../../features/songs/songs.dart';
 import '../../features/playlists/playlists.dart';
 
+// Hive Boxes Providers
+final songBoxProvider = Provider<Box<Song>>((ref) {
+  return Hive.box<Song>(HiveBoxes.songs);
+});
+
+final playlistBoxProvider = Provider<Box<Playlist>>((ref) {
+  return Hive.box<Playlist>(HiveBoxes.playlists);
+});
+
 // HTTP Clients Providers
 final youtubeClientProvider = Provider<YouTubeClient>((ref) {
   return YouTubeClient();
@@ -22,22 +31,4 @@ final youtubeServiceProvider = Provider<YouTubeService>((ref) {
 
 final lyricsServiceProvider = Provider<LyricsService>((ref) {
   return LyricsService(client: ref.watch(lrclibClientProvider));
-});
-
-// Hive Box Providers
-final songBoxProvider = Provider<Box<Song>>((ref) {
-  return Hive.box<Song>(HiveBoxes.songs);
-});
-
-final playlistBoxProvider = Provider<Box<Playlist>>((ref) {
-  return Hive.box<Playlist>(HiveBoxes.playlists);
-});
-
-// Repository Providers (Injecting Boxes)
-final songRepositoryProvider = Provider<SongRepository>((ref) {
-  return HiveSongRepository(songBox: ref.watch(songBoxProvider));
-});
-
-final playlistRepositoryProvider = Provider<PlaylistRepository>((ref) {
-  return HivePlaylistRepository(playlistBox: ref.watch(playlistBoxProvider));
 });
