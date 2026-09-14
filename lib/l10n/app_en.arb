@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+  "appTitle": "SetlistPad",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "homeTitle": "SetlistPad",
+  "@homeTitle": {
+    "description": "Title displayed on the home screen app bar"
+  },
+  "coreInitialized": "SetlistPad Core Initialized",
+  "@coreInitialized": {
+    "description": "Status text indicating core initialization"
+  },
+  "hiveRiverpodReady": "Hive DB & Riverpod ready for Playlists and Songs",
+  "@hiveRiverpodReady": {
+    "description": "Subtitle indicating database and state management status"
+  }
+}
