@@ -23,10 +23,10 @@ class YouTubeService {
 
   YouTubeService({YouTubeClient? client}) : client = client ?? YouTubeClient();
 
-  /// Extracts YouTube Video ID from various URL formats
+  /// Extracts YouTube Video ID from various URL formats, including Shorts and Live
   String? extractVideoId(String url) {
     final regExp = RegExp(
-      r'^(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})',
+      r'^(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([\w-]{11})',
       caseSensitive: false,
     );
     final match = regExp.firstMatch(url.trim());
@@ -77,10 +77,13 @@ class YouTubeService {
         .replaceAll(RegExp(r'\s*[\(\[](Official|Lyric|Music|Audio|HD|4K|\d{4}).*?[\)\]]', caseSensitive: false), '')
         .trim();
 
-    if (cleanTitle.contains('-')) {
-      final parts = cleanTitle.split('-');
-      final artistPart = parts[0].trim();
-      final titlePart = parts.sublist(1).join('-').trim();
+    // Look for a deliberate artist - title separator: whitespace around hyphen, en-dash, or em-dash
+    final delimiterRegex = RegExp(r'\s+[-–—]\s+');
+    final delimiterMatch = delimiterRegex.firstMatch(cleanTitle);
+
+    if (delimiterMatch != null) {
+      final artistPart = cleanTitle.substring(0, delimiterMatch.start).trim();
+      final titlePart = cleanTitle.substring(delimiterMatch.end).trim();
       if (artistPart.isNotEmpty && titlePart.isNotEmpty) {
         return {'artist': artistPart, 'title': titlePart};
       }

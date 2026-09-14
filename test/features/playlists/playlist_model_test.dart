@@ -26,11 +26,12 @@ void main() {
       expect(deserialized.songIds, playlist.songIds);
     });
 
-    test('copyWith should clone playlist with updated song list', () {
+    test('copyWith should clone playlist with updated song list or clear youtubePlaylistUrl', () {
       final now = DateTime.now();
       final playlist = Playlist(
         id: 'pl-1',
         name: 'Rock Classics',
+        youtubePlaylistUrl: 'https://youtube.com/playlist?list=123',
         songIds: ['song-1'],
         createdAt: now,
         updatedAt: now,
@@ -38,6 +39,11 @@ void main() {
 
       final updated = playlist.copyWith(songIds: ['song-1', 'song-2']);
       expect(updated.songIds, ['song-1', 'song-2']);
+      expect(updated.youtubePlaylistUrl, 'https://youtube.com/playlist?list=123');
+
+      // Test clearing nullable youtubePlaylistUrl
+      final cleared = playlist.copyWith(clearYoutubePlaylistUrl: true);
+      expect(cleared.youtubePlaylistUrl, isNull);
     });
   });
 }

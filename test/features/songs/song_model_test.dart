@@ -33,6 +33,7 @@ void main() {
         id: 'song-1',
         title: 'Yellow',
         artist: 'Coldplay',
+        youtubeUrl: 'https://youtube.com/watch?v=123',
         lyrics: 'Original lyrics',
         createdAt: now,
         updatedAt: now,
@@ -42,6 +43,11 @@ void main() {
       expect(updated.id, song.id);
       expect(updated.title, song.title);
       expect(updated.lyrics, 'Updated lyrics');
+      expect(updated.youtubeUrl, 'https://youtube.com/watch?v=123');
+
+      // Test clearing nullable youtubeUrl
+      final cleared = song.copyWith(clearYoutubeUrl: true);
+      expect(cleared.youtubeUrl, isNull);
     });
   });
 }
