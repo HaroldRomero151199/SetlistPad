@@ -1,93 +1,91 @@
 # SetlistPad
 
-**SetlistPad** es una aplicación Flutter moderna para gestionar, organizar y compartir listas de reproducción de canciones con información detallada, acceso a letras y videos de YouTube.
+**SetlistPad** is a Flutter application designed to help musicians, singers, and music enthusiasts manage and organize their song lyrics in one place.
 
-## Características
+## Features
 
-- 🎵 **Gestión de Canciones**: Crear, editar y organizar canciones con metadatos completos
-- 📋 **Listas de Reproducción**: Organiza tus canciones en playlists temáticas
-- 🎹 **Búsqueda Integrada**: Encuentra canciones y letras fácilmente
-- 📝 **Letras Sincronizadas**: Accede a letras con timestamps
-- 🎥 **Videos de YouTube**: Integración directa con YouTube
-- 💾 **Almacenamiento Local**: Sincronización offline con Hive
-- 🎨 **Diseño Moderno**: Interfaz intuitiva y responsiva
+- 🎵 **Song Management**: Create, edit, and organize songs with complete metadata
+- 📋 **Lyrics Display**: Access and view song lyrics with a clean, readable interface
+- 🔍 **Search Functionality**: Easily find songs and lyrics
+- 💾 **Local Storage**: Offline access to your song library with Hive
+- 🎨 **Modern Design**: Intuitive and responsive user interface
 
-## Arquitectura
+## Architecture
 
-El proyecto sigue un patrón **Feature-First + Clean Architecture**:
+The project follows a **Feature-First + Clean Architecture** pattern:
 
 ```
 lib/
 ├── core/
-│   ├── clients/       # Clientes HTTP y modelos DTO
-│   ├── config/        # Configuración global y constantes
-│   ├── providers/     # Inyección de dependencias con Riverpod
-│   ├── services/      # Lógica de negocio (YouTube, Letras)
-│   └── theme/         # Temas y tipografía
+│   ├── clients/       # HTTP clients and DTO models
+│   ├── config/        # Global configuration and constants
+│   ├── providers/     # Dependency injection with Riverpod
+│   ├── services/      # Business logic services
+│   └── theme/         # Themes and typography
 ├── features/
-│   ├── songs/         # Módulo de canciones
-│   └── playlists/     # Módulo de listas de reproducción
+│   ├── songs/         # Songs feature module
+│   └── playlists/     # Playlists feature module
 └── main.dart
 ```
 
-## Stack Tecnológico
+## Tech Stack
 
 - **Framework**: Flutter 3.x
 - **State Management**: Flutter Riverpod 2.x
-- **Base de Datos Local**: Hive
+- **Local Database**: Hive
 - **HTTP Client**: http
-- **Tipado**: Dart con tipos fuertes
+- **Language**: Dart with strong typing
 
-## Requisitos Previos
+## Requirements
 
-- Flutter 3.0 o superior
-- Dart 3.0 o superior
+- Flutter 3.0 or higher
+- Dart 3.0 or higher
 - iOS 11.0+ / Android 5.0+
 
-## Instalación
+## Installation
 
-1. Clona el repositorio:
+1. Clone the repository:
    ```bash
    git clone https://github.com/HaroldRomero151199/SetlistPad.git
    cd SetlistPad
    ```
 
-2. Instala las dependencias:
+2. Install dependencies:
    ```bash
    flutter pub get
    ```
 
-3. Ejecuta la aplicación:
+3. Run the application:
    ```bash
    flutter run
    ```
 
-## Desarrollo
+## Development
 
-### Análisis de Código
+### Code Analysis
 ```bash
 flutter analyze
 ```
 
-### Ejecutar Tests
+### Run Tests
 ```bash
 flutter test
 ```
 
-### Build para Producción
+### Build for Production
 ```bash
 flutter build apk      # Android
 flutter build ios      # iOS
 ```
 
-## Directrices para Agentes IA
+## Development Guidelines
 
-Ver [`AGENTS.md`](./AGENTS.md) para las normas obligatorias de desarrollo, patrones arquitectónicos y mejores prácticas.
+See [`AGENTS.md`](./AGENTS.md) for mandatory development rules, architectural patterns, and best practices.
 
-## Licencia
+## License
 
-Este proyecto está licenciado bajo la Licencia MIT.
+This project is licensed under the MIT License.
 
-## Autor
+## Author
 
 [Harold Romero](https://github.com/HaroldRomero151199)
