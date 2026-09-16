@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 
 // ignore_for_file: type=lint
 
@@ -92,7 +93,10 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('es'),
+  ];
 
   /// The title of the application
   ///
@@ -117,6 +121,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hive DB & Riverpod ready for Playlists and Songs'**
   String get hiveRiverpodReady;
+
+  /// Label for the Playlists bottom navigation destination
+  ///
+  /// In en, this message translates to:
+  /// **'Playlists'**
+  String get navPlaylists;
+
+  /// Label for the Song Library bottom navigation destination
+  ///
+  /// In en, this message translates to:
+  /// **'Song Library'**
+  String get navSongLibrary;
+
+  /// Title of the Playlists screen app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Playlists'**
+  String get playlistsTitle;
+
+  /// Dialog title for creating a new playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Playlist'**
+  String get createNewPlaylist;
+
+  /// Label for the playlist name text field
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist Name'**
+  String get playlistName;
+
+  /// Hint for the playlist name text field
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Saturday Gig Setlist'**
+  String get playlistNameHint;
+
+  /// Validation error when playlist name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name'**
+  String get playlistNameRequired;
+
+  /// Label for optional playlist description
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get descriptionOptional;
+
+  /// Generic cancel button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Create button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// Placeholder text when no playlists exist
+  ///
+  /// In en, this message translates to:
+  /// **'No playlists yet'**
+  String get noPlaylistsYet;
+
+  /// Call to action text when no playlists exist
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to create a playlist'**
+  String get tapToCreatePlaylist;
+
+  /// Label for the New Playlist floating action button
+  ///
+  /// In en, this message translates to:
+  /// **'New Playlist'**
+  String get newPlaylist;
+
+  /// Pluralized count of songs
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 Song} other{{count} Songs}}'**
+  String songsCount(num count);
+
+  /// Button to add a song to playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Add Song'**
+  String get addSong;
+
+  /// Title of modal to add a song to playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Add Song to Playlist'**
+  String get addSongToPlaylist;
+
+  /// Message shown when all library songs are already in the playlist
+  ///
+  /// In en, this message translates to:
+  /// **'No more songs available to add.\nImport more songs in the Library tab.'**
+  String get noMoreSongsToAdd;
+
+  /// Message shown when a playlist is currently empty
+  ///
+  /// In en, this message translates to:
+  /// **'No songs in this playlist yet.\nTap \"Add Song\" to add songs from your library.'**
+  String get noSongsInPlaylist;
+
+  /// Tooltip for delete playlist action button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Playlist'**
+  String get deletePlaylistTooltip;
+
+  /// Title of the Song Library screen app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Song Library'**
+  String get songLibraryTitle;
+
+  /// Hint text for song search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search title or artist...'**
+  String get searchHint;
+
+  /// Placeholder text when song library is empty or search yields no results
+  ///
+  /// In en, this message translates to:
+  /// **'No songs found in library'**
+  String get noSongsFound;
+
+  /// Call to action text when song library is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to import from YouTube'**
+  String get tapToImport;
+
+  /// Label for the import YouTube floating action button
+  ///
+  /// In en, this message translates to:
+  /// **'Import YouTube'**
+  String get importYoutube;
+
+  /// Title of the import YouTube dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Import from YouTube'**
+  String get importFromYoutube;
+
+  /// Explanation text in import YouTube dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a YouTube video link. Title, artist, and lyrics (via LRCLIB) will be fetched automatically.'**
+  String get importYoutubeDescription;
+
+  /// Label for YouTube URL input field
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube URL'**
+  String get youtubeUrl;
+
+  /// Hint text for YouTube URL input field
+  ///
+  /// In en, this message translates to:
+  /// **'https://www.youtube.com/watch?v=...'**
+  String get youtubeUrlHint;
+
+  /// Validation error when URL is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a URL'**
+  String get pleaseEnterUrl;
+
+  /// Validation error when URL is not a recognized YouTube URL
+  ///
+  /// In en, this message translates to:
+  /// **'Must be a valid YouTube URL'**
+  String get invalidYoutubeUrl;
+
+  /// Loading text while fetching song details
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching metadata & lyrics...'**
+  String get fetchingMetadata;
+
+  /// Button to trigger import action
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importButton;
+
+  /// Success message when a song is imported
+  ///
+  /// In en, this message translates to:
+  /// **'Imported \"{title}\" by {artist}'**
+  String songImportedSuccess(String title, String artist);
+
+  /// Tooltip for edit lyrics button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Lyrics'**
+  String get editLyrics;
+
+  /// Tooltip for save lyrics button
+  ///
+  /// In en, this message translates to:
+  /// **'Save Lyrics'**
+  String get saveLyrics;
+
+  /// Snackbar message when lyrics are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics updated successfully!'**
+  String get lyricsUpdatedSuccess;
+
+  /// Label for text size slider control
+  ///
+  /// In en, this message translates to:
+  /// **'Text Size:'**
+  String get textSize;
+
+  /// Hint text when editing song lyrics
+  ///
+  /// In en, this message translates to:
+  /// **'Enter or edit lyrics here...'**
+  String get lyricsHint;
+
+  /// Placeholder text when song has no lyrics
+  ///
+  /// In en, this message translates to:
+  /// **'No lyrics available for this song. Tap edit icon above to add lyrics.'**
+  String get noLyricsAvailable;
+
+  /// Prefix for displaying error messages
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String errorPrefix(String error);
 }
 
 class _AppLocalizationsDelegate
@@ -130,7 +374,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en'].contains(locale.languageCode);
+      <String>['en', 'es'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -141,6 +385,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
   }
 
   throw FlutterError(

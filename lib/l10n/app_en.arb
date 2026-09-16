@@ -15,5 +15,184 @@
   "hiveRiverpodReady": "Hive DB & Riverpod ready for Playlists and Songs",
   "@hiveRiverpodReady": {
     "description": "Subtitle indicating database and state management status"
+  },
+  "navPlaylists": "Playlists",
+  "@navPlaylists": {
+    "description": "Label for the Playlists bottom navigation destination"
+  },
+  "navSongLibrary": "Song Library",
+  "@navSongLibrary": {
+    "description": "Label for the Song Library bottom navigation destination"
+  },
+  "playlistsTitle": "Playlists",
+  "@playlistsTitle": {
+    "description": "Title of the Playlists screen app bar"
+  },
+  "createNewPlaylist": "Create New Playlist",
+  "@createNewPlaylist": {
+    "description": "Dialog title for creating a new playlist"
+  },
+  "playlistName": "Playlist Name",
+  "@playlistName": {
+    "description": "Label for the playlist name text field"
+  },
+  "playlistNameHint": "e.g. Saturday Gig Setlist",
+  "@playlistNameHint": {
+    "description": "Hint for the playlist name text field"
+  },
+  "playlistNameRequired": "Please enter a name",
+  "@playlistNameRequired": {
+    "description": "Validation error when playlist name is empty"
+  },
+  "descriptionOptional": "Description (optional)",
+  "@descriptionOptional": {
+    "description": "Label for optional playlist description"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic cancel button text"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create button text"
+  },
+  "noPlaylistsYet": "No playlists yet",
+  "@noPlaylistsYet": {
+    "description": "Placeholder text when no playlists exist"
+  },
+  "tapToCreatePlaylist": "Tap + to create a playlist",
+  "@tapToCreatePlaylist": {
+    "description": "Call to action text when no playlists exist"
+  },
+  "newPlaylist": "New Playlist",
+  "@newPlaylist": {
+    "description": "Label for the New Playlist floating action button"
+  },
+  "songsCount": "{count, plural, =1{1 Song} other{{count} Songs}}",
+  "@songsCount": {
+    "description": "Pluralized count of songs",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "addSong": "Add Song",
+  "@addSong": {
+    "description": "Button to add a song to playlist"
+  },
+  "addSongToPlaylist": "Add Song to Playlist",
+  "@addSongToPlaylist": {
+    "description": "Title of modal to add a song to playlist"
+  },
+  "noMoreSongsToAdd": "No more songs available to add.\nImport more songs in the Library tab.",
+  "@noMoreSongsToAdd": {
+    "description": "Message shown when all library songs are already in the playlist"
+  },
+  "noSongsInPlaylist": "No songs in this playlist yet.\nTap \"Add Song\" to add songs from your library.",
+  "@noSongsInPlaylist": {
+    "description": "Message shown when a playlist is currently empty"
+  },
+  "deletePlaylistTooltip": "Delete Playlist",
+  "@deletePlaylistTooltip": {
+    "description": "Tooltip for delete playlist action button"
+  },
+  "songLibraryTitle": "Song Library",
+  "@songLibraryTitle": {
+    "description": "Title of the Song Library screen app bar"
+  },
+  "searchHint": "Search title or artist...",
+  "@searchHint": {
+    "description": "Hint text for song search input"
+  },
+  "noSongsFound": "No songs found in library",
+  "@noSongsFound": {
+    "description": "Placeholder text when song library is empty or search yields no results"
+  },
+  "tapToImport": "Tap + to import from YouTube",
+  "@tapToImport": {
+    "description": "Call to action text when song library is empty"
+  },
+  "importYoutube": "Import YouTube",
+  "@importYoutube": {
+    "description": "Label for the import YouTube floating action button"
+  },
+  "importFromYoutube": "Import from YouTube",
+  "@importFromYoutube": {
+    "description": "Title of the import YouTube dialog"
+  },
+  "importYoutubeDescription": "Paste a YouTube video link. Title, artist, and lyrics (via LRCLIB) will be fetched automatically.",
+  "@importYoutubeDescription": {
+    "description": "Explanation text in import YouTube dialog"
+  },
+  "youtubeUrl": "YouTube URL",
+  "@youtubeUrl": {
+    "description": "Label for YouTube URL input field"
+  },
+  "youtubeUrlHint": "https://www.youtube.com/watch?v=...",
+  "@youtubeUrlHint": {
+    "description": "Hint text for YouTube URL input field"
+  },
+  "pleaseEnterUrl": "Please enter a URL",
+  "@pleaseEnterUrl": {
+    "description": "Validation error when URL is empty"
+  },
+  "invalidYoutubeUrl": "Must be a valid YouTube URL",
+  "@invalidYoutubeUrl": {
+    "description": "Validation error when URL is not a recognized YouTube URL"
+  },
+  "fetchingMetadata": "Fetching metadata & lyrics...",
+  "@fetchingMetadata": {
+    "description": "Loading text while fetching song details"
+  },
+  "importButton": "Import",
+  "@importButton": {
+    "description": "Button to trigger import action"
+  },
+  "songImportedSuccess": "Imported \"{title}\" by {artist}",
+  "@songImportedSuccess": {
+    "description": "Success message when a song is imported",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "editLyrics": "Edit Lyrics",
+  "@editLyrics": {
+    "description": "Tooltip for edit lyrics button"
+  },
+  "saveLyrics": "Save Lyrics",
+  "@saveLyrics": {
+    "description": "Tooltip for save lyrics button"
+  },
+  "lyricsUpdatedSuccess": "Lyrics updated successfully!",
+  "@lyricsUpdatedSuccess": {
+    "description": "Snackbar message when lyrics are saved"
+  },
+  "textSize": "Text Size:",
+  "@textSize": {
+    "description": "Label for text size slider control"
+  },
+  "lyricsHint": "Enter or edit lyrics here...",
+  "@lyricsHint": {
+    "description": "Hint text when editing song lyrics"
+  },
+  "noLyricsAvailable": "No lyrics available for this song. Tap edit icon above to add lyrics.",
+  "@noLyricsAvailable": {
+    "description": "Placeholder text when song has no lyrics"
+  },
+  "errorPrefix": "Error: {error}",
+  "@errorPrefix": {
+    "description": "Prefix for displaying error messages",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   }
 }
