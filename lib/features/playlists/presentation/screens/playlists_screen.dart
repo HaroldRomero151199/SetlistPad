@@ -159,6 +159,7 @@ class PlaylistsScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'playlists_fab',
         onPressed: () => _showCreatePlaylistDialog(context, ref),
         icon: const Icon(Icons.add),
         label: Text(context.l10n.newPlaylist),

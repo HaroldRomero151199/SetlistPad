@@ -159,6 +159,7 @@ class SongsScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'songs_fab',
         onPressed: () => _showImportDialog(context),
         icon: const Icon(Icons.add),
         label: Text(context.l10n.importYoutube),
