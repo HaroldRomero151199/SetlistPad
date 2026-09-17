@@ -194,5 +194,13 @@
         "type": "String"
       }
     }
+  },
+  "errorImportingSong": "Failed to import song. Please check the URL and your connection.",
+  "@errorImportingSong": {
+    "description": "Error message displayed when song import fails"
+  },
+  "errorInvalidYoutubeUrlFormat": "Invalid YouTube video URL format.",
+  "@errorInvalidYoutubeUrlFormat": {
+    "description": "Error message displayed when YouTube URL format is invalid"
   }
 }

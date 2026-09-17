@@ -66,6 +66,11 @@ class PlaylistsNotifier extends Notifier<AsyncValue<List<Playlist>>> {
     await loadPlaylists();
   }
 
+  Future<void> removeSongFromAllPlaylists(String songId) async {
+    await repository.removeSongFromAllPlaylists(songId);
+    await loadPlaylists();
+  }
+
   Future<void> deletePlaylist(String playlistId) async {
     await repository.deletePlaylist(playlistId);
     await loadPlaylists();

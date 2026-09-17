@@ -5,8 +5,27 @@ import '../providers/songs_notifier.dart';
 import '../widgets/import_song_dialog.dart';
 import 'song_detail_screen.dart';
 
-class SongsScreen extends ConsumerWidget {
+class SongsScreen extends ConsumerStatefulWidget {
   const SongsScreen({super.key});
+
+  @override
+  ConsumerState<SongsScreen> createState() => _SongsScreenState();
+}
+
+class _SongsScreenState extends ConsumerState<SongsScreen> {
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _showImportDialog(BuildContext context) {
     showDialog(
@@ -16,7 +35,7 @@ class SongsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final filteredSongsAsync = ref.watch(filteredSongsProvider);
 
     return Scaffold(
@@ -30,6 +49,7 @@ class SongsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: TextField(
+              controller: _searchController,
               onChanged: (val) {
                 ref.read(searchQueryProvider.notifier).query = val;
               },
@@ -43,6 +63,7 @@ class SongsScreen extends ConsumerWidget {
                     return IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () {
+                        _searchController.clear();
                         ref.read(searchQueryProvider.notifier).query = '';
                       },
                     );

@@ -43,5 +43,7 @@
   "textSize": "Tamaño del texto:",
   "lyricsHint": "Ingresa o edita la letra aquí...",
   "noLyricsAvailable": "No hay letra disponible para esta canción. Toca el ícono de editar para agregarla.",
-  "errorPrefix": "Error: {error}"
+  "errorPrefix": "Error: {error}",
+  "errorImportingSong": "No se pudo importar la canción. Verifica el enlace y tu conexión.",
+  "errorInvalidYoutubeUrlFormat": "Formato de URL de YouTube no válido."
 }

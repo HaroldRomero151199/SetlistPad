@@ -8,6 +8,7 @@ abstract class PlaylistRepository {
   Future<void> deletePlaylist(String id);
   Future<void> addSongToPlaylist(String playlistId, String songId);
   Future<void> removeSongFromPlaylist(String playlistId, String songId);
+  Future<void> removeSongFromAllPlaylists(String songId);
 }
 
 class HivePlaylistRepository implements PlaylistRepository {
@@ -60,6 +61,20 @@ class HivePlaylistRepository implements PlaylistRepository {
         updatedAt: DateTime.now(),
       );
       await playlistBox.put(playlistId, updatedPlaylist);
+    }
+  }
+
+  @override
+  Future<void> removeSongFromAllPlaylists(String songId) async {
+    for (final playlist in playlistBox.values) {
+      if (playlist.songIds.contains(songId)) {
+        final updatedSongs = List<String>.from(playlist.songIds)..remove(songId);
+        final updatedPlaylist = playlist.copyWith(
+          songIds: updatedSongs,
+          updatedAt: DateTime.now(),
+        );
+        await playlistBox.put(playlist.id, updatedPlaylist);
+      }
     }
   }
 }

@@ -61,5 +61,20 @@ void main() {
       updated = await repository.getPlaylistById(playlist.id);
       expect(updated?.songIds.isEmpty, isTrue);
     });
+
+    test('removeSongFromAllPlaylists should remove song across playlists and update state', () async {
+      final p1 = await notifier.createPlaylist(name: 'Set 1');
+      final p2 = await notifier.createPlaylist(name: 'Set 2');
+
+      await notifier.addSongToPlaylist(p1.id, 'song-abc');
+      await notifier.addSongToPlaylist(p2.id, 'song-abc');
+
+      await notifier.removeSongFromAllPlaylists('song-abc');
+
+      final updatedP1 = await repository.getPlaylistById(p1.id);
+      final updatedP2 = await repository.getPlaylistById(p2.id);
+      expect(updatedP1?.songIds.contains('song-abc'), isFalse);
+      expect(updatedP2?.songIds.contains('song-abc'), isFalse);
+    });
   });
 }

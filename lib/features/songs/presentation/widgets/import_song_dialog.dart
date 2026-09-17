@@ -47,10 +47,15 @@ class _ImportSongDialogState extends ConsumerState<ImportSongDialog> {
         );
       }
     } catch (e) {
+      debugPrint('Error importing song from YouTube: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = e.toString().replaceAll('Exception: ', '');
+          if (e is FormatException) {
+            _errorMessage = context.l10n.errorInvalidYoutubeUrlFormat;
+          } else {
+            _errorMessage = context.l10n.errorImportingSong;
+          }
         });
       }
     }

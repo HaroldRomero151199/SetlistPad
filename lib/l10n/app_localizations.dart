@@ -361,6 +361,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error: {error}'**
   String errorPrefix(String error);
+
+  /// Error message displayed when song import fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to import song. Please check the URL and your connection.'**
+  String get errorImportingSong;
+
+  /// Error message displayed when YouTube URL format is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid YouTube video URL format.'**
+  String get errorInvalidYoutubeUrlFormat;
 }
 
 class _AppLocalizationsDelegate

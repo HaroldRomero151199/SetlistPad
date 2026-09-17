@@ -14,6 +14,8 @@ void main() {
       expect(l10n.songsCount(1), '1 Song');
       expect(l10n.songsCount(5), '5 Songs');
       expect(l10n.songImportedSuccess('SongA', 'ArtistB'), 'Imported "SongA" by ArtistB');
+      expect(l10n.errorImportingSong, 'Failed to import song. Please check the URL and your connection.');
+      expect(l10n.errorInvalidYoutubeUrlFormat, 'Invalid YouTube video URL format.');
     });
 
     test('Spanish translations are loaded and correct', () async {
@@ -26,6 +28,8 @@ void main() {
       expect(l10n.songsCount(1), '1 Canción');
       expect(l10n.songsCount(5), '5 Canciones');
       expect(l10n.songImportedSuccess('SongA', 'ArtistB'), 'Se importó "SongA" de ArtistB');
+      expect(l10n.errorImportingSong, 'No se pudo importar la canción. Verifica el enlace y tu conexión.');
+      expect(l10n.errorInvalidYoutubeUrlFormat, 'Formato de URL de YouTube no válido.');
     });
   });
 }

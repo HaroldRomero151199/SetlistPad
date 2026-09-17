@@ -161,4 +161,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String errorPrefix(String error) {
     return 'Error: $error';
   }
+
+  @override
+  String get errorImportingSong =>
+      'Failed to import song. Please check the URL and your connection.';
+
+  @override
+  String get errorInvalidYoutubeUrlFormat =>
+      'Invalid YouTube video URL format.';
 }
