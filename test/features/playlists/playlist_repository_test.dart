@@ -125,5 +125,21 @@ void main() {
       // Removing from non-existent playlist should not crash
       await repository.removeSongFromPlaylist('non-existent', 'song-1');
     });
+
+    test('removeSongFromAllPlaylists should remove song across multiple playlists', () async {
+      await repository.savePlaylist(makePlaylist(id: 'pl-1', songIds: ['song-1', 'song-2']));
+      await repository.savePlaylist(makePlaylist(id: 'pl-2', songIds: ['song-1', 'song-3']));
+      await repository.savePlaylist(makePlaylist(id: 'pl-3', songIds: ['song-2', 'song-3']));
+
+      await repository.removeSongFromAllPlaylists('song-1');
+
+      final pl1 = await repository.getPlaylistById('pl-1');
+      final pl2 = await repository.getPlaylistById('pl-2');
+      final pl3 = await repository.getPlaylistById('pl-3');
+
+      expect(pl1!.songIds, ['song-2']);
+      expect(pl2!.songIds, ['song-3']);
+      expect(pl3!.songIds, ['song-2', 'song-3']);
+    });
   });
 }
