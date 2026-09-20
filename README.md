@@ -1,5 +1,7 @@
 # SetlistPad
-
+<p align="center">
+  <img src="2fedea49-5ce6-48d8-875f-05184706909c.jpg" alt="Banner de SetlistPad" width="100%">
+</p>
 **SetlistPad** is a Flutter application designed to help musicians, singers, and music enthusiasts manage and organize their song lyrics in one place.
 
 ## Features
