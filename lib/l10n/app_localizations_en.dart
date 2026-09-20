@@ -169,4 +169,85 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorInvalidYoutubeUrlFormat =>
       'Invalid YouTube video URL format.';
+
+  @override
+  String get importPlaylist => 'Import Playlist';
+
+  @override
+  String get importFromYoutubePlaylist => 'Import YouTube Playlist';
+
+  @override
+  String get importYoutubePlaylistDescription =>
+      'Paste a YouTube playlist link to preview and import its songs.';
+
+  @override
+  String get youtubePlaylistUrl => 'YouTube Playlist URL';
+
+  @override
+  String get youtubePlaylistUrlHint =>
+      'https://www.youtube.com/playlist?list=...';
+
+  @override
+  String get fetchingPlaylist => 'Fetching playlist tracks...';
+
+  @override
+  String get playlistPreviewTitle => 'Playlist Preview';
+
+  @override
+  String get selectAll => 'Select All';
+
+  @override
+  String get deselectAll => 'Deselect All';
+
+  @override
+  String get createPlaylistWithSongs =>
+      'Create new playlist with selected songs';
+
+  @override
+  String importSelectedSongs(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import $countString Songs',
+      one: 'Import 1 Song',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String importingSongProgress(int current, int total) {
+    return 'Importing $current of $total...';
+  }
+
+  @override
+  String playlistImportSuccess(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Imported $countString songs from playlist',
+      one: 'Imported 1 song from playlist',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorPlaylistEmpty =>
+      'The playlist is empty, private, or could not be loaded.';
+
+  @override
+  String get errorFetchingPlaylist =>
+      'Failed to fetch playlist tracks. Please check the URL and your connection.';
+
+  @override
+  String get errorInvalidPlaylistUrl => 'Invalid YouTube playlist URL.';
 }

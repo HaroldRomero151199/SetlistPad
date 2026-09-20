@@ -1,22 +1,9 @@
 import '../clients/models/youtube_models.dart';
 import '../clients/youtube_client.dart';
 import '../config/api_config.dart';
-
-class YouTubeMetadata {
-  final String title;
-  final String artist;
-  final String rawTitle;
-  final String? thumbnailUrl;
-  final String url;
-
-  YouTubeMetadata({
-    required this.title,
-    required this.artist,
-    required this.rawTitle,
-    this.thumbnailUrl,
-    required this.url,
-  });
-}
+import 'models/youtube_metadata.dart';
+import 'models/youtube_playlist_item.dart';
+import 'models/youtube_playlist_metadata.dart';
 
 class YouTubeService {
   final YouTubeClient client;
@@ -41,6 +28,53 @@ class YouTubeService {
     );
     final match = regExp.firstMatch(url.trim());
     return match?.group(1);
+  }
+
+  /// Checks whether a URL is a YouTube playlist URL
+  bool isPlaylistUrl(String url) {
+    final trimmed = url.trim();
+    if (!trimmed.contains('youtube.com') && !trimmed.contains('youtu.be')) {
+      return false;
+    }
+    if (trimmed.contains('/playlist')) {
+      return true;
+    }
+    final playlistId = extractPlaylistId(trimmed);
+    final videoId = extractVideoId(trimmed);
+    return playlistId != null && videoId == null;
+  }
+
+  /// Fetches metadata and parsed tracks for a YouTube playlist
+  Future<YouTubePlaylistMetadata> fetchPlaylistMetadata(
+    String playlistUrl,
+  ) async {
+    final playlistId = extractPlaylistId(playlistUrl);
+    if (playlistId == null || playlistId.isEmpty) {
+      throw const FormatException('Invalid YouTube playlist URL format');
+    }
+
+    final response = await client.fetchPlaylistData(
+      YouTubePlaylistRequest(playlistId: playlistId),
+    );
+
+    final items = response.tracks.map((track) {
+      final parsed = parseTitleAndArtist(track.title, track.author);
+      return YouTubePlaylistItem(
+        videoId: track.videoId,
+        title: parsed['title']!,
+        artist: parsed['artist']!,
+        rawTitle: track.title,
+        thumbnailUrl: track.thumbnailUrl,
+        url: track.videoUrl,
+      );
+    }).toList();
+
+    return YouTubePlaylistMetadata(
+      id: playlistId,
+      title: response.title,
+      author: response.author,
+      items: items,
+    );
   }
 
   /// Fetches metadata for a single YouTube video using open oEmbed endpoint

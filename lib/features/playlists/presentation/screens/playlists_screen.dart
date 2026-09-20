@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/playlists_notifier.dart';
+import '../widgets/import_playlist_dialog.dart';
 import 'playlist_detail_screen.dart';
 
 class PlaylistsScreen extends ConsumerWidget {
@@ -74,6 +75,13 @@ class PlaylistsScreen extends ConsumerWidget {
     );
   }
 
+  void _showImportPlaylistDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => const ImportPlaylistDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playlistsAsync = ref.watch(playlistsNotifierProvider);
@@ -82,6 +90,13 @@ class PlaylistsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(context.l10n.playlistsTitle),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.playlist_play),
+            tooltip: context.l10n.importFromYoutubePlaylist,
+            onPressed: () => _showImportPlaylistDialog(context),
+          ),
+        ],
       ),
       body: playlistsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -109,42 +124,43 @@ class PlaylistsScreen extends ConsumerWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(12),
             itemCount: playlists.length,
             itemBuilder: (context, index) {
               final playlist = playlists[index];
               return Card(
-                elevation: 2,
-                margin: const EdgeInsets.only(bottom: 12),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
                   leading: CircleAvatar(
-                    radius: 24,
                     backgroundColor: context.colorScheme.primary,
                     child: Icon(Icons.queue_music, color: context.colorScheme.onPrimary),
                   ),
                   title: Text(
                     playlist.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  subtitle: Row(
                     children: [
+                      Text(context.l10n.songsCount(playlist.songIds.length)),
                       if (playlist.description.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(playlist.description),
-                      ],
-                      const SizedBox(height: 6),
-                      Text(
-                        context.l10n.songsCount(playlist.songIds.length),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.colorScheme.primary,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '• ${playlist.description}',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: context.colorScheme.onSurfaceVariant),
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete_outline, color: context.colorScheme.onSurfaceVariant),
+                    onPressed: () {
+                      ref
+                          .read(playlistsNotifierProvider.notifier)
+                          .deletePlaylist(playlist.id);
+                    },
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

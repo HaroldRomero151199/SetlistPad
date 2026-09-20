@@ -86,6 +86,64 @@ class SongsNotifier extends Notifier<AsyncValue<List<Song>>> {
     return newSong;
   }
 
+  Future<List<Song>> importSongsBatch(
+    List<YouTubePlaylistItem> items, {
+    String? targetPlaylistId,
+    void Function(int current, int total)? onProgress,
+  }) async {
+    final importedSongs = <Song>[];
+    final total = items.length;
+
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      onProgress?.call(i + 1, total);
+
+      String lyrics = '';
+      try {
+        lyrics = await lyricsService.fetchLyrics(
+              title: item.title,
+              artist: item.artist,
+            ) ??
+            '';
+      } catch (_) {
+        // Fallback: continue batch import even if lyrics service is unavailable
+      }
+
+      final now = DateTime.now();
+      final song = Song(
+        id: const Uuid().v4(),
+        title: item.title,
+        artist: item.artist,
+        youtubeUrl: item.url,
+        lyrics: lyrics,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      await repository.saveSong(song);
+      importedSongs.add(song);
+
+      if (targetPlaylistId != null) {
+        final plRepo = playlistRepository;
+        if (plRepo != null) {
+          await plRepo.addSongToPlaylist(targetPlaylistId, song.id);
+        }
+      }
+    }
+
+    await loadSongs();
+
+    if (targetPlaylistId != null) {
+      try {
+        await ref.read(playlistsNotifierProvider.notifier).loadPlaylists();
+      } catch (_) {
+        // Safe fallback in isolated test setups
+      }
+    }
+
+    return importedSongs;
+  }
+
   Future<void> addSong({
     required String title,
     required String artist,

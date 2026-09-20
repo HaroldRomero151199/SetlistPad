@@ -10,4 +10,7 @@ abstract final class ApiConfig {
   // YouTube API Configuration
   static const String youtubeOembedBaseUrl = 'https://www.youtube.com/oembed';
   static const String youtubeWatchBaseUrl = 'https://www.youtube.com/watch';
+  static const String youtubePlaylistBaseUrl = 'https://www.youtube.com/playlist';
+  static const String youtubeFeedsVideosUrl =
+      'https://www.youtube.com/feeds/videos.xml';
 }

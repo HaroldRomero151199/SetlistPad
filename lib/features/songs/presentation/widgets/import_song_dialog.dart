@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/providers.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../playlists/presentation/widgets/import_playlist_dialog.dart';
 import '../providers/songs_notifier.dart';
 
 class ImportSongDialog extends ConsumerStatefulWidget {
@@ -25,6 +27,19 @@ class _ImportSongDialogState extends ConsumerState<ImportSongDialog> {
   Future<void> _handleImport() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final url = _urlController.text.trim();
+    final youtubeService = ref.read(youtubeServiceProvider);
+
+    // If the input URL is a playlist, seamlessly forward to ImportPlaylistDialog
+    if (youtubeService.isPlaylistUrl(url)) {
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        builder: (_) => ImportPlaylistDialog(initialUrl: url),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -33,7 +48,7 @@ class _ImportSongDialogState extends ConsumerState<ImportSongDialog> {
     try {
       final song = await ref
           .read(songsNotifierProvider.notifier)
-          .importSongFromYoutubeUrl(_urlController.text.trim());
+          .importSongFromYoutubeUrl(url);
 
       if (mounted) {
         Navigator.of(context).pop(song);
@@ -99,7 +114,7 @@ class _ImportSongDialogState extends ConsumerState<ImportSongDialog> {
                   return context.l10n.pleaseEnterUrl;
                 }
                 if (!value.contains('youtube.com') &&
-                    !value.contains('youtu.be')) {
+                  !value.contains('youtu.be')) {
                   return context.l10n.invalidYoutubeUrl;
                 }
                 return null;

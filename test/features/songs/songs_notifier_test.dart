@@ -41,7 +41,7 @@ void main() {
   tearDown(() async {
     container.dispose();
     await songBox.close();
-    await Hive.deleteBoxFromDisk('test_songs_box');
+    // Box closed cleanly without Windows file lock
   });
 
   group('SongsNotifier Tests', () {
@@ -56,6 +56,62 @@ void main() {
       expect(songs.length, 1);
       expect(songs.first.title, 'Yellow');
       expect(songs.first.artist, 'Coldplay');
+    });
+
+    test('importSongsBatch should save multiple songs and optionally add them to target playlist', () async {
+      final fakePlaylistRepo = FakePlaylistRepository();
+      fakePlaylistRepo.playlists.add(Playlist(
+        id: 'pl-batch',
+        name: 'Batch Playlist',
+        songIds: const [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ));
+
+      final batchContainer = ProviderContainer(
+        overrides: [
+          songRepositoryProvider.overrideWithValue(repository),
+          playlistRepositoryProvider.overrideWithValue(fakePlaylistRepo),
+          youtubeServiceProvider.overrideWithValue(youtubeService),
+          lyricsServiceProvider.overrideWithValue(lyricsService),
+        ],
+      );
+      addTearDown(batchContainer.dispose);
+
+      final batchNotifier = batchContainer.read(songsNotifierProvider.notifier);
+
+      final items = [
+        YouTubePlaylistItem(
+          videoId: 'v1',
+          title: 'Yellow',
+          artist: 'Coldplay',
+          rawTitle: 'Coldplay - Yellow',
+          url: 'https://youtube.com/watch?v=v1',
+        ),
+        YouTubePlaylistItem(
+          videoId: 'v2',
+          title: 'Creep',
+          artist: 'Radiohead',
+          rawTitle: 'Radiohead - Creep',
+          url: 'https://youtube.com/watch?v=v2',
+        ),
+      ];
+
+      final progressValues = <int>[];
+      final imported = await batchNotifier.importSongsBatch(
+        items,
+        targetPlaylistId: 'pl-batch',
+        onProgress: (cur, tot) => progressValues.add(cur),
+      );
+
+      expect(imported.length, 2);
+      expect(progressValues, [1, 2]);
+
+      final allSongs = await repository.getAllSongs();
+      expect(allSongs.length, 2);
+
+      final updatedPlaylist = await fakePlaylistRepo.getPlaylistById('pl-batch');
+      expect(updatedPlaylist?.songIds.length, 2);
     });
 
     test('updateLyrics should modify song lyrics', () async {
