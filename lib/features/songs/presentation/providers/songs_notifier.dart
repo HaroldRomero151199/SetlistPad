@@ -144,6 +144,23 @@ class SongsNotifier extends Notifier<AsyncValue<List<Song>>> {
     return importedSongs;
   }
 
+  Future<bool> fetchAndSaveLyrics(String songId) async {
+    final song = await repository.getSongById(songId);
+    if (song == null) return false;
+
+    final lyrics = await lyricsService.fetchLyrics(
+      title: song.title,
+      artist: song.artist,
+    );
+
+    if (lyrics != null && lyrics.trim().isNotEmpty) {
+      await updateLyrics(songId, lyrics.trim());
+      return true;
+    }
+
+    return false;
+  }
+
   Future<void> addSong({
     required String title,
     required String artist,

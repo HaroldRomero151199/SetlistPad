@@ -4,3 +4,7 @@ export 'presentation/providers/songs_notifier.dart';
 export 'presentation/screens/songs_screen.dart';
 export 'presentation/screens/song_detail_screen.dart';
 export 'presentation/widgets/import_song_dialog.dart';
+export 'presentation/widgets/song_empty_lyrics_view.dart';
+export 'presentation/widgets/song_font_size_toolbar.dart';
+export 'presentation/widgets/song_lyrics_editor.dart';
+export 'presentation/widgets/song_lyrics_viewer.dart';
