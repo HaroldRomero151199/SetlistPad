@@ -1,3 +1,4 @@
+import '../config/config.dart';
 import '../clients/clients.dart';
 import 'models/youtube_metadata.dart';
 import 'models/youtube_playlist_item.dart';
@@ -88,7 +89,7 @@ class YouTubeService {
       throw const FormatException('Invalid YouTube URL format');
     }
 
-    final canonicalUrl = '\${ApiConfig.youtubeWatchBaseUrl}?v=\$videoId';
+    final canonicalUrl = '${ApiConfig.youtubeWatchBaseUrl}?v=$videoId';
     final oembedResponse = await client.fetchOEmbedData(
       YouTubeOembedRequest(url: canonicalUrl),
     );
