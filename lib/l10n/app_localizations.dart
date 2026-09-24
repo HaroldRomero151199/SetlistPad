@@ -373,6 +373,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid YouTube video URL format.'**
   String get errorInvalidYoutubeUrlFormat;
+
+  /// Button label for importing a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Import Playlist'**
+  String get importPlaylist;
+
+  /// Title of the YouTube playlist import dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Import YouTube Playlist'**
+  String get importFromYoutubePlaylist;
+
+  /// Description in the YouTube playlist import dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a YouTube playlist link to preview and import its songs.'**
+  String get importYoutubePlaylistDescription;
+
+  /// Label for YouTube playlist URL input
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube Playlist URL'**
+  String get youtubePlaylistUrl;
+
+  /// Hint text for YouTube playlist URL input
+  ///
+  /// In en, this message translates to:
+  /// **'https://www.youtube.com/playlist?list=...'**
+  String get youtubePlaylistUrlHint;
+
+  /// Loading indicator text while fetching playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching playlist tracks...'**
+  String get fetchingPlaylist;
+
+  /// Title of the playlist preview dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist Preview'**
+  String get playlistPreviewTitle;
+
+  /// Button label to select all playlist items
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get selectAll;
+
+  /// Button label to deselect all playlist items
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect All'**
+  String get deselectAll;
+
+  /// Option checkbox to create a playlist with the imported songs
+  ///
+  /// In en, this message translates to:
+  /// **'Create new playlist with selected songs'**
+  String get createPlaylistWithSongs;
+
+  /// Button text to import selected count of songs
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Import 1 Song} other{Import {count} Songs}}'**
+  String importSelectedSongs(num count);
+
+  /// Progress label during batch song import
+  ///
+  /// In en, this message translates to:
+  /// **'Importing {current} of {total}...'**
+  String importingSongProgress(int current, int total);
+
+  /// Success message when playlist songs are imported
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Imported 1 song from playlist} other{Imported {count} songs from playlist}}'**
+  String playlistImportSuccess(num count);
+
+  /// Error message when playlist has no tracks
+  ///
+  /// In en, this message translates to:
+  /// **'The playlist is empty, private, or could not be loaded.'**
+  String get errorPlaylistEmpty;
+
+  /// Error message when playlist fetching fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch playlist tracks. Please check the URL and your connection.'**
+  String get errorFetchingPlaylist;
+
+  /// Error message when playlist URL is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid YouTube playlist URL.'**
+  String get errorInvalidPlaylistUrl;
+
+  /// Button label to search lyrics online for a song
+  ///
+  /// In en, this message translates to:
+  /// **'Search Lyrics Online'**
+  String get searchLyricsOnline;
+
+  /// Loading state text while searching for lyrics online
+  ///
+  /// In en, this message translates to:
+  /// **'Searching lyrics...'**
+  String get searchingLyrics;
+
+  /// Success message when online lyrics are found and updated
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics found and updated!'**
+  String get lyricsFoundSuccess;
+
+  /// Message when online lyrics search yields no result
+  ///
+  /// In en, this message translates to:
+  /// **'No lyrics found online for this song.'**
+  String get noLyricsFoundOnline;
+
+  /// Error message when creating a playlist with a duplicate name
+  ///
+  /// In en, this message translates to:
+  /// **'A playlist with this name already exists'**
+  String get playlistAlreadyExists;
+
+  /// Button to dismiss import dialog while letting import finish in background
+  ///
+  /// In en, this message translates to:
+  /// **'Run in background'**
+  String get hideDialog;
 }
 
 class _AppLocalizationsDelegate

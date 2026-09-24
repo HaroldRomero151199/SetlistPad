@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../songs.dart';
 
+/// Screen displaying song details, lyrics viewer/editor, and online lyrics retrieval
 class SongDetailScreen extends ConsumerStatefulWidget {
   final Song song;
 
@@ -15,6 +16,7 @@ class SongDetailScreen extends ConsumerStatefulWidget {
 class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
   late TextEditingController _lyricsController;
   bool _isEditing = false;
+  bool _isSearchingLyrics = false;
   double _fontSize = 16.0;
 
   @override
@@ -45,6 +47,51 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
     }
   }
 
+  Future<void> _searchLyricsOnline() async {
+    setState(() {
+      _isSearchingLyrics = true;
+    });
+
+    try {
+      final success = await ref
+          .read(songsNotifierProvider.notifier)
+          .fetchAndSaveLyrics(widget.song.id);
+
+      if (!mounted) return;
+
+      if (success) {
+        final currentSongs = ref.read(songsNotifierProvider).value;
+        final updatedSong = currentSongs?.firstWhere(
+          (s) => s.id == widget.song.id,
+          orElse: () => widget.song,
+        );
+        if (updatedSong != null) {
+          _lyricsController.text = updatedSong.lyrics;
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.lyricsFoundSuccess)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.noLyricsFoundOnline)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.noLyricsFoundOnline)),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSearchingLyrics = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final songsAsync = ref.watch(songsNotifierProvider);
@@ -65,6 +112,18 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
           ],
         ),
         actions: [
+          if (!_isEditing)
+            IconButton(
+              icon: _isSearchingLyrics
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.download_rounded),
+              tooltip: context.l10n.searchLyricsOnline,
+              onPressed: _isSearchingLyrics ? null : _searchLyricsOnline,
+            ),
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
             tooltip: _isEditing ? context.l10n.saveLyrics : context.l10n.editLyrics,
@@ -82,65 +141,31 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
       ),
       body: Column(
         children: [
-          // Font size controls bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: Row(
-              children: [
-                const Icon(Icons.format_size, size: 20),
-                const SizedBox(width: 8),
-                Text(context.l10n.textSize, style: const TextStyle(fontSize: 12)),
-                Expanded(
-                  child: Slider(
-                    value: _fontSize,
-                    min: 12.0,
-                    max: 28.0,
-                    divisions: 8,
-                    label: '${_fontSize.round()}px',
-                    onChanged: (val) {
-                      setState(() {
-                        _fontSize = val;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
+          SongFontSizeToolbar(
+            fontSize: _fontSize,
+            onFontSizeChanged: (val) {
+              setState(() {
+                _fontSize = val;
+              });
+            },
           ),
-
-          // Lyrics Body
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: _isEditing
-                  ? TextField(
+                  ? SongLyricsEditor(
                       controller: _lyricsController,
-                      maxLines: null,
-                      expands: true,
-                      style: TextStyle(
-                        fontSize: _fontSize,
-                        fontFamily: 'monospace',
-                        height: 1.4,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: context.l10n.lyricsHint,
-                        border: const OutlineInputBorder(),
-                      ),
+                      fontSize: _fontSize,
                     )
-                  : SingleChildScrollView(
-                      child: SelectableText(
-                        currentSong.lyrics.isEmpty
-                            ? context.l10n.noLyricsAvailable
-                            : currentSong.lyrics,
-                        style: TextStyle(
+                  : currentSong.lyrics.isEmpty
+                      ? SongEmptyLyricsView(
+                          isSearchingLyrics: _isSearchingLyrics,
+                          onSearchOnline: _searchLyricsOnline,
+                        )
+                      : SongLyricsViewer(
+                          lyrics: currentSong.lyrics,
                           fontSize: _fontSize,
-                          fontFamily: 'monospace',
-                          height: 1.5,
-                          color: currentSong.lyrics.isEmpty ? context.colorScheme.onSurfaceVariant : null,
                         ),
-                      ),
-                    ),
             ),
           ),
         ],

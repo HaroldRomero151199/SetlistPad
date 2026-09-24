@@ -1,68 +1,41 @@
-# Agent Guidelines & Development Rules for SetlistPad
+# Agent Guidelines & Architecture Map for SetlistPad
 
-This document defines mandatory guidelines, architecture principles, and best practices for AI agents working on the **SetlistPad** codebase.
-
----
-
-## 1. Package Dependencies Rule
-- **Always use the latest stable versions** of all packages in `pubspec.yaml`.
-- Never introduce deprecated or outdated major versions when adding dependencies (e.g., use latest Riverpod 3.x, latest Hive, latest http, etc.).
-- Run `flutter pub upgrade --major-versions` to verify package compatibility when adding new libraries.
+This document serves as the **primary entry point** for any AI Agent or developer working on the **SetlistPad** codebase. It outlines core architectural rules and provides a comprehensive navigation map across features.
 
 ---
 
-## 2. Architecture & Code Structure
-SetlistPad follows a **Feature-First + Clean Architecture** modular pattern.
+## 🗺️ Documentation & Feature Map
 
-```
-lib/
-├── core/
-│   ├── clients/         # Low-level HTTP/API clients & DTOs (Requests/Responses)
-│   │   ├── models/      # Strongly-typed Request and Response models
-│   │   └── clients.dart # Barrel file for clients & DTOs
-│   ├── config/          # Global constants, API endpoints (ApiConfig), Hive box names (HiveBoxes)
-│   │   └── config.dart  # Barrel file for config
-│   ├── providers/       # Global Riverpod providers & dependency injection wiring
-│   ├── services/        # Business logic services (YouTube, Lyrics)
-│   │   └── services.dart# Barrel file for services
-│   └── theme/           # App themes, colors, typography
-├── features/
-│   ├── songs/           # Songs feature (domain/models, data/repositories, presentation)
-│   │   └── songs.dart   # Feature barrel file
-│   └── playlists/       # Playlists feature (domain/models, data/repositories, presentation)
-│       └── playlists.dart # Feature barrel file
-└── main.dart
-```
+For in-depth implementation details and file organization, refer to the dedicated feature specifications:
 
-### Architectural Layering Guidelines
-1. **Clients Layer (`lib/core/clients/`)**: Handles raw HTTP operations, status code checks, and JSON mapping using explicit Request (`toQueryParameters()`) and Response (`fromJson()`) DTO classes.
-2. **Services Layer (`lib/core/services/`)**: Consumes Clients to perform domain service logic (parsing YouTube links, cleaning lyrics timestamps, handling fallbacks).
-3. **Data/Repository Layer (`lib/features/*/data/repositories/`)**: Abstract repository interfaces with Hive local storage implementations (`HiveSongRepository`, `HivePlaylistRepository`).
-4. **State Management**: **Flutter Riverpod** (`flutter_riverpod`). Always inject dependencies using Riverpod `Provider` / `Notifier`.
-5. **Barrel Files**: Always export related classes in feature/module barrel files (`clients.dart`, `services.dart`, `songs.dart`, `playlists.dart`) to keep imports clean and maintainable.
+1. 📂 **[Playlists Feature](docs/FEATURE_PLAYLISTS.md)**:
+   - Playlist management, YouTube playlist batch import, and UI separation into `screens/`, `views/`, `widgets/`, and `utils/`.
+2. 📂 **[Songs Feature](docs/FEATURE_SONGS.md)**:
+   - Song catalog, real-time search, monospace chord/lyrics viewer, font size toolbar, and lyrics editor.
+3. 📂 **[Core Architecture](docs/CORE_ARCHITECTURE.md)**:
+   - Modular HTTP clients (`lrclib`, `youtube`, `lyrics_ovh`), domain services, regex title sanitization, and Levenshtein/token fuzzy matching algorithms.
+4. 📂 **[Lyrics Engine & Playlist Import](docs/LYRICS_ENGINE_AND_PLAYLIST_IMPORT.md)**:
+   - Technical specifications and algorithmic breakdown of the playlist scraper, track sanitizer, and lyrics search engine.
 
 ---
 
-## 3. Internationalization (i18n / l10n) Rule
-- **Never hardcode user-facing strings** in widgets or presentation logic.
-- All strings must be defined in the ARB files located in `lib/l10n/` (`app_en.arb`, `app_es.arb`, etc.).
-- Use Flutter's `AppLocalizations` (via `AppLocalizations.of(context)` or `context.l10n` extension) for all UI text, labels, hints, dialogs, empty states, tooltips, validation messages, and snackbars.
-- For dynamic values or plurals, define parameterized ICU messages in the ARB file (e.g., `{count, plural, =1{1 Song} other{{count} Songs}}`).
-- Always verify that `MaterialApp` in `lib/main.dart` configures `localizationsDelegates: AppLocalizations.localizationsDelegates` and `supportedLocales: AppLocalizations.supportedLocales`.
-- Run `flutter gen-l10n` when modifying ARB files to regenerate translation classes.
+## 🏛️ Mandatory Architectural Rules
 
----
+### 1. Vertical Slicing & Single Responsibility Principle (SRP)
+- **One class per file**: Never combine DTOs, requests, responses, or multiple widgets into a single file.
+- **Strict Presentation Layer Separation**:
+  - `screens/`: Full-page destinations with navigation routes (`Scaffold`, `AppBar`).
+  - `views/`: Composed step/state views representing major sections of a screen or dialog.
+  - `widgets/`: Reusable atomic UI components and orchestrator dialogs.
+  - `utils/`: Pure UI presentation helpers and formatting algorithms without widget dependencies.
+- **Modular HTTP Clients in `core/clients/`**:
+  - Every external service client (`lrclib`, `youtube`, `lyrics_ovh`) resides in its own domain folder containing its private `models/`, client class, and barrel export.
 
-## 4. Centralized Theming & Colors Rule
-- **Never hardcode raw colors** (`Colors.deepPurple`, `Colors.grey`, `Colors.white`, `Colors.redAccent`, etc.) in presentation widgets or inline styles.
-- Always use theme tokens via `Theme.of(context).colorScheme` (e.g., `colorScheme.primary`, `colorScheme.onPrimary`, `colorScheme.error`, `colorScheme.surface`, `colorScheme.onSurfaceVariant`) or designated tokens from `AppTheme` (`lib/core/theme/app_theme.dart`).
-- Maintain consistent visual styling across dark and light themes without breaking the app's design system.
+### 2. Platform File Stability
+- **Never modify or commit** generated platform files in `linux/flutter/`, `macos/Flutter/`, or `windows/flutter/ephemeral/`.
+- All changes must remain strictly scoped to `lib/`, `test/`, and `docs/`.
 
----
-
-## 5. Testing & Verification Rules
-- Always maintain unit test coverage for services, clients, models, and repositories.
-- Before committing any changes, verify that:
-  1. `flutter analyze` passes with zero issues/warnings.
-  2. `flutter test` executes with 100% passing tests.
-
+### 3. Quality Assurance Standards
+- Before completing any task:
+  - `dart analyze`: Must report **0 issues found**.
+  - `flutter test`: All tests must pass with a **100% pass rate**.

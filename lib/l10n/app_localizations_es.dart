@@ -169,4 +169,105 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get errorInvalidYoutubeUrlFormat =>
       'Formato de URL de YouTube no válido.';
+
+  @override
+  String get importPlaylist => 'Importar lista';
+
+  @override
+  String get importFromYoutubePlaylist => 'Importar lista de YouTube';
+
+  @override
+  String get importYoutubePlaylistDescription =>
+      'Pega un enlace de una lista de reproducción de YouTube para ver e importar sus temas.';
+
+  @override
+  String get youtubePlaylistUrl => 'URL de la lista de YouTube';
+
+  @override
+  String get youtubePlaylistUrlHint =>
+      'https://www.youtube.com/playlist?list=...';
+
+  @override
+  String get fetchingPlaylist => 'Obteniendo canciones de la lista...';
+
+  @override
+  String get playlistPreviewTitle => 'Vista previa de la lista';
+
+  @override
+  String get selectAll => 'Seleccionar todo';
+
+  @override
+  String get deselectAll => 'Deseleccionar todo';
+
+  @override
+  String get createPlaylistWithSongs =>
+      'Crear nueva lista con las canciones seleccionadas';
+
+  @override
+  String importSelectedSongs(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Importar $countString canciones',
+      one: 'Importar 1 canción',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String importingSongProgress(int current, int total) {
+    return 'Importando $current de $total...';
+  }
+
+  @override
+  String playlistImportSuccess(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Se importaron $countString canciones de la lista',
+      one: 'Se importó 1 canción de la lista',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorPlaylistEmpty =>
+      'La lista de reproducción está vacía, es privada o no se pudo cargar.';
+
+  @override
+  String get errorFetchingPlaylist =>
+      'No se pudo obtener las canciones de la lista. Verifica el enlace y tu conexión.';
+
+  @override
+  String get errorInvalidPlaylistUrl =>
+      'URL de lista de reproducción de YouTube no válida.';
+
+  @override
+  String get searchLyricsOnline => 'Buscar letra en línea';
+
+  @override
+  String get searchingLyrics => 'Buscando letra...';
+
+  @override
+  String get lyricsFoundSuccess => '¡Letra encontrada y actualizada!';
+
+  @override
+  String get noLyricsFoundOnline =>
+      'No se encontró la letra en línea para esta canción.';
+
+  @override
+  String get playlistAlreadyExists => 'Ya existe una lista con este nombre';
+
+  @override
+  String get hideDialog => 'Continuar en segundo plano';
 }

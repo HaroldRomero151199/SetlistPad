@@ -45,5 +45,33 @@
   "noLyricsAvailable": "No hay letra disponible para esta canción. Toca el ícono de editar para agregarla.",
   "errorPrefix": "Error: {error}",
   "errorImportingSong": "No se pudo importar la canción. Verifica el enlace y tu conexión.",
-  "errorInvalidYoutubeUrlFormat": "Formato de URL de YouTube no válido."
+  "errorInvalidYoutubeUrlFormat": "Formato de URL de YouTube no válido.",
+  "importPlaylist": "Importar lista",
+  "importFromYoutubePlaylist": "Importar lista de YouTube",
+  "importYoutubePlaylistDescription": "Pega un enlace de una lista de reproducción de YouTube para ver e importar sus temas.",
+  "youtubePlaylistUrl": "URL de la lista de YouTube",
+  "youtubePlaylistUrlHint": "https://www.youtube.com/playlist?list=...",
+  "fetchingPlaylist": "Obteniendo canciones de la lista...",
+  "playlistPreviewTitle": "Vista previa de la lista",
+  "selectAll": "Seleccionar todo",
+  "deselectAll": "Deseleccionar todo",
+  "createPlaylistWithSongs": "Crear nueva lista con las canciones seleccionadas",
+  "importSelectedSongs": "{count, plural, =1{Importar 1 canción} other{Importar {count} canciones}}",
+  "importingSongProgress": "Importando {current} de {total}...",
+  "playlistImportSuccess": "{count, plural, =1{Se importó 1 canción de la lista} other{Se importaron {count} canciones de la lista}}",
+  "errorPlaylistEmpty": "La lista de reproducción está vacía, es privada o no se pudo cargar.",
+  "errorFetchingPlaylist": "No se pudo obtener las canciones de la lista. Verifica el enlace y tu conexión.",
+  "errorInvalidPlaylistUrl": "URL de lista de reproducción de YouTube no válida.",
+  "searchLyricsOnline": "Buscar letra en línea",
+  "searchingLyrics": "Buscando letra...",
+  "lyricsFoundSuccess": "¡Letra encontrada y actualizada!",
+  "noLyricsFoundOnline": "No se encontró la letra en línea para esta canción.",
+  "playlistAlreadyExists": "Ya existe una lista con este nombre",
+  "@playlistAlreadyExists": {
+    "description": "Error message when creating a playlist with a duplicate name"
+  },
+  "hideDialog": "Continuar en segundo plano",
+  "@hideDialog": {
+    "description": "Button to dismiss import dialog while letting import finish in background"
+  }
 }

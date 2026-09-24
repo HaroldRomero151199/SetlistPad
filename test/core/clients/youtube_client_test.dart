@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:setlist_pad/core/clients/models/youtube_models.dart';
-import 'package:setlist_pad/core/clients/youtube_client.dart';
+import 'package:setlist_pad/core/clients/clients.dart';
 
 void main() {
   group('YouTubeClient Tests', () {
@@ -43,6 +42,249 @@ void main() {
         ),
         throwsA(isA<Exception>()),
       );
+    });
+
+    test('fetchPlaylistData extracts tracks from ytInitialData web page HTML', () async {
+      final sampleHtml = '''
+      <!DOCTYPE html>
+      <html>
+      <body>
+        <script>
+          var ytInitialData = {
+            "header": {
+              "playlistHeaderRenderer": {
+                "title": {"simpleText": "My Live Setlist"},
+                "ownerText": {"runs": [{"text": "RockBand"}]}
+              }
+            },
+            "contents": {
+              "twoColumnBrowseResultsRenderer": {
+                "tabs": [{
+                  "tabRenderer": {
+                    "content": {
+                      "sectionListRenderer": {
+                        "contents": [{
+                          "itemSectionRenderer": {
+                            "contents": [{
+                              "playlistVideoListRenderer": {
+                                "contents": [
+                                  {
+                                    "playlistVideoRenderer": {
+                                      "videoId": "vid12345678",
+                                      "title": {"runs": [{"text": "Queen - Radio Ga Ga"}]},
+                                      "shortBylineText": {"runs": [{"text": "Queen"}]},
+                                      "thumbnail": {
+                                        "thumbnails": [{"url": "https://i.ytimg.com/vi/vid12345678/hqdefault.jpg"}]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "playlistVideoRenderer": {
+                                      "videoId": "vid87654321",
+                                      "title": {"simpleText": "U2 - With or Without You"},
+                                      "shortBylineText": {"runs": [{"text": "U2"}]}
+                                    }
+                                  }
+                                ]
+                              }
+                            }]
+                          }
+                        }]
+                      }
+                    }
+                  }
+                }]
+              }
+            }
+          };
+        </script>
+      </body>
+      </html>
+      ''';
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/playlist') {
+          return http.Response(sampleHtml, 200);
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final client = YouTubeClient(client: mockClient);
+      final response = await client.fetchPlaylistData(
+        const YouTubePlaylistRequest(playlistId: 'PLTest123'),
+      );
+
+      expect(response.playlistId, 'PLTest123');
+      expect(response.title, 'My Live Setlist');
+      expect(response.author, 'RockBand');
+      expect(response.tracks.length, 2);
+      expect(response.tracks[0].videoId, 'vid12345678');
+      expect(response.tracks[0].title, 'Queen - Radio Ga Ga');
+      expect(response.tracks[0].author, 'Queen');
+      expect(response.tracks[0].thumbnailUrl, 'https://i.ytimg.com/vi/vid12345678/hqdefault.jpg');
+      expect(response.tracks[1].videoId, 'vid87654321');
+      expect(response.tracks[1].title, 'U2 - With or Without You');
+    });
+
+    test('fetchPlaylistData falls back to Atom XML feed when web page lacks ytInitialData', () async {
+      const atomXml = '''<?xml version="1.0" encoding="UTF-8"?>
+      <feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/">
+        <title>Fallback Playlist Title</title>
+        <author><name>Harold</name></author>
+        <entry>
+          <yt:videoId>xmlVid12345</yt:videoId>
+          <media:title>Bon Jovi - Livin on a Prayer</media:title>
+          <author><name>Bon Jovi</name></author>
+          <media:group>
+            <media:thumbnail url="https://i.ytimg.com/vi/xmlVid12345/hqdefault.jpg"/>
+          </media:group>
+        </entry>
+      </feed>
+      ''';
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/playlist') {
+          return http.Response('<html><body>Blocked / Bot Check</body></html>', 200);
+        }
+        if (request.url.path.contains('videos.xml')) {
+          return http.Response(atomXml, 200);
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final client = YouTubeClient(client: mockClient);
+      final response = await client.fetchPlaylistData(
+        const YouTubePlaylistRequest(playlistId: 'PLFallback123'),
+      );
+
+      expect(response.playlistId, 'PLFallback123');
+      expect(response.title, 'Fallback Playlist Title');
+      expect(response.author, 'Harold');
+      expect(response.tracks.length, 1);
+      expect(response.tracks[0].videoId, 'xmlVid12345');
+      expect(response.tracks[0].title, 'Bon Jovi - Livin on a Prayer');
+      expect(response.tracks[0].author, 'Bon Jovi');
+    });
+
+    test('fetchPlaylistData throws FormatException if playlistId is empty', () async {
+      final client = YouTubeClient();
+      expect(
+        () => client.fetchPlaylistData(const YouTubePlaylistRequest(playlistId: '')),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('fetchPlaylistData throws Exception when both web page and Atom feed fail', () async {
+      final mockClient = MockClient((request) async => http.Response('Error', 500));
+      final client = YouTubeClient(client: mockClient);
+
+      expect(
+        () => client.fetchPlaylistData(const YouTubePlaylistRequest(playlistId: 'PLNonexistent')),
+        throwsA(isA<Exception>()),
+      );
+    });
+    test('fetchPlaylistData follows continuation pages to fetch all tracks', () async {
+      final initialPageHtml = '''
+      <!DOCTYPE html>
+      <html>
+      <body>
+        <script>
+          var ytInitialData = {
+            "header": {
+              "playlistHeaderRenderer": {
+                "title": {"simpleText": "Paginated Playlist"}
+              }
+            },
+            "contents": {
+              "twoColumnBrowseResultsRenderer": {
+                "tabs": [{
+                  "tabRenderer": {
+                    "content": {
+                      "sectionListRenderer": {
+                        "contents": [{
+                          "itemSectionRenderer": {
+                            "contents": [{
+                              "playlistVideoListRenderer": {
+                                "contents": [
+                                  {
+                                    "playlistVideoRenderer": {
+                                      "videoId": "vid_page_1",
+                                      "title": {"simpleText": "Track 1"}
+                                    }
+                                  },
+                                  {
+                                    "continuationItemRenderer": {
+                                      "continuationEndpoint": {
+                                        "continuationCommand": {
+                                          "token": "token_page_2"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }]
+                          }
+                        }]
+                      }
+                    }
+                  }
+                }]
+              }
+            }
+          };
+        </script>
+        <script>
+          var ytcfg = {"INNERTUBE_API_KEY":"FakeKey123"};
+        </script>
+      </body>
+      </html>
+      ''';
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/playlist') {
+          return http.Response(initialPageHtml, 200);
+        }
+        if (request.url.path == '/youtubei/v1/browse') {
+          expect(request.method, 'POST');
+          expect(request.url.queryParameters['key'], 'FakeKey123');
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          expect(body['continuation'], 'token_page_2');
+
+          return http.Response(
+            jsonEncode({
+              'onResponseReceivedActions': [
+                {
+                  'appendContinuationItemsAction': {
+                    'continuationItems': [
+                      {
+                        'playlistVideoRenderer': {
+                          'videoId': 'vid_page_2',
+                          'title': {'simpleText': 'Track 2'},
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final client = YouTubeClient(client: mockClient);
+      final response = await client.fetchPlaylistData(
+        const YouTubePlaylistRequest(playlistId: 'PLPaginated'),
+      );
+
+      expect(response.title, 'Paginated Playlist');
+      expect(response.tracks.length, 2);
+      expect(response.tracks[0].videoId, 'vid_page_1');
+      expect(response.tracks[0].title, 'Track 1');
+      expect(response.tracks[1].videoId, 'vid_page_2');
+      expect(response.tracks[1].title, 'Track 2');
     });
   });
 }

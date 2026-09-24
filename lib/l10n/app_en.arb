@@ -202,5 +202,113 @@
   "errorInvalidYoutubeUrlFormat": "Invalid YouTube video URL format.",
   "@errorInvalidYoutubeUrlFormat": {
     "description": "Error message displayed when YouTube URL format is invalid"
+  },
+  "importPlaylist": "Import Playlist",
+  "@importPlaylist": {
+    "description": "Button label for importing a playlist"
+  },
+  "importFromYoutubePlaylist": "Import YouTube Playlist",
+  "@importFromYoutubePlaylist": {
+    "description": "Title of the YouTube playlist import dialog"
+  },
+  "importYoutubePlaylistDescription": "Paste a YouTube playlist link to preview and import its songs.",
+  "@importYoutubePlaylistDescription": {
+    "description": "Description in the YouTube playlist import dialog"
+  },
+  "youtubePlaylistUrl": "YouTube Playlist URL",
+  "@youtubePlaylistUrl": {
+    "description": "Label for YouTube playlist URL input"
+  },
+  "youtubePlaylistUrlHint": "https://www.youtube.com/playlist?list=...",
+  "@youtubePlaylistUrlHint": {
+    "description": "Hint text for YouTube playlist URL input"
+  },
+  "fetchingPlaylist": "Fetching playlist tracks...",
+  "@fetchingPlaylist": {
+    "description": "Loading indicator text while fetching playlist"
+  },
+  "playlistPreviewTitle": "Playlist Preview",
+  "@playlistPreviewTitle": {
+    "description": "Title of the playlist preview dialog"
+  },
+  "selectAll": "Select All",
+  "@selectAll": {
+    "description": "Button label to select all playlist items"
+  },
+  "deselectAll": "Deselect All",
+  "@deselectAll": {
+    "description": "Button label to deselect all playlist items"
+  },
+  "createPlaylistWithSongs": "Create new playlist with selected songs",
+  "@createPlaylistWithSongs": {
+    "description": "Option checkbox to create a playlist with the imported songs"
+  },
+  "importSelectedSongs": "{count, plural, =1{Import 1 Song} other{Import {count} Songs}}",
+  "@importSelectedSongs": {
+    "description": "Button text to import selected count of songs",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "importingSongProgress": "Importing {current} of {total}...",
+  "@importingSongProgress": {
+    "description": "Progress label during batch song import",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportSuccess": "{count, plural, =1{Imported 1 song from playlist} other{Imported {count} songs from playlist}}",
+  "@playlistImportSuccess": {
+    "description": "Success message when playlist songs are imported",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "errorPlaylistEmpty": "The playlist is empty, private, or could not be loaded.",
+  "@errorPlaylistEmpty": {
+    "description": "Error message when playlist has no tracks"
+  },
+  "errorFetchingPlaylist": "Failed to fetch playlist tracks. Please check the URL and your connection.",
+  "@errorFetchingPlaylist": {
+    "description": "Error message when playlist fetching fails"
+  },
+  "errorInvalidPlaylistUrl": "Invalid YouTube playlist URL.",
+  "@errorInvalidPlaylistUrl": {
+    "description": "Error message when playlist URL is invalid"
+  },
+  "searchLyricsOnline": "Search Lyrics Online",
+  "@searchLyricsOnline": {
+    "description": "Button label to search lyrics online for a song"
+  },
+  "searchingLyrics": "Searching lyrics...",
+  "@searchingLyrics": {
+    "description": "Loading state text while searching for lyrics online"
+  },
+  "lyricsFoundSuccess": "Lyrics found and updated!",
+  "@lyricsFoundSuccess": {
+    "description": "Success message when online lyrics are found and updated"
+  },
+  "noLyricsFoundOnline": "No lyrics found online for this song.",
+  "@noLyricsFoundOnline": {
+    "description": "Message when online lyrics search yields no result"
+  },
+  "playlistAlreadyExists": "A playlist with this name already exists",
+  "@playlistAlreadyExists": {
+    "description": "Error message when creating a playlist with a duplicate name"
+  },
+  "hideDialog": "Run in background",
+  "@hideDialog": {
+    "description": "Button to dismiss import dialog while letting import finish in background"
   }
 }

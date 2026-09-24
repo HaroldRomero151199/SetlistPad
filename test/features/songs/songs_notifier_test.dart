@@ -6,6 +6,16 @@ import 'package:setlist_pad/core/services/services.dart';
 import 'package:setlist_pad/features/playlists/playlists.dart';
 import 'package:setlist_pad/features/songs/songs.dart';
 
+class FakeLyricsService extends LyricsService {
+  @override
+  Future<String?> fetchLyrics({required String title, required String artist}) async {
+    if (title.contains('Yellow')) {
+      return 'Look at the stars...';
+    }
+    return null;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Box<Song> songBox;
@@ -25,7 +35,7 @@ void main() {
 
     repository = HiveSongRepository(songBox: songBox);
     youtubeService = YouTubeService();
-    lyricsService = LyricsService();
+    lyricsService = FakeLyricsService();
 
     container = ProviderContainer(
       overrides: [
@@ -40,8 +50,8 @@ void main() {
 
   tearDown(() async {
     container.dispose();
+    await songBox.clear();
     await songBox.close();
-    await Hive.deleteBoxFromDisk('test_songs_box');
   });
 
   group('SongsNotifier Tests', () {
@@ -56,6 +66,82 @@ void main() {
       expect(songs.length, 1);
       expect(songs.first.title, 'Yellow');
       expect(songs.first.artist, 'Coldplay');
+    });
+
+    test('importSongsBatch should save multiple songs and optionally add them to target playlist', () async {
+      final fakePlaylistRepo = FakePlaylistRepository();
+      fakePlaylistRepo.playlists.add(Playlist(
+        id: 'pl-batch',
+        name: 'Batch Playlist',
+        songIds: const [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ));
+
+      final batchContainer = ProviderContainer(
+        overrides: [
+          songRepositoryProvider.overrideWithValue(repository),
+          playlistRepositoryProvider.overrideWithValue(fakePlaylistRepo),
+          youtubeServiceProvider.overrideWithValue(youtubeService),
+          lyricsServiceProvider.overrideWithValue(lyricsService),
+        ],
+      );
+      addTearDown(batchContainer.dispose);
+
+      final batchNotifier = batchContainer.read(songsNotifierProvider.notifier);
+
+      final items = [
+        YouTubePlaylistItem(
+          videoId: 'v1',
+          title: 'Yellow',
+          artist: 'Coldplay',
+          rawTitle: 'Coldplay - Yellow',
+          url: 'https://youtube.com/watch?v=v1',
+        ),
+        YouTubePlaylistItem(
+          videoId: 'v2',
+          title: 'Creep',
+          artist: 'Radiohead',
+          rawTitle: 'Radiohead - Creep',
+          url: 'https://youtube.com/watch?v=v2',
+        ),
+      ];
+
+      final progressValues = <int>[];
+      final imported = await batchNotifier.importSongsBatch(
+        items,
+        targetPlaylistId: 'pl-batch',
+        onProgress: (cur, tot) => progressValues.add(cur),
+      );
+
+      expect(imported.length, 2);
+      expect(progressValues, [1, 2]);
+
+      final allSongs = await repository.getAllSongs();
+      expect(allSongs.length, 2);
+
+      final updatedPlaylist = await fakePlaylistRepo.getPlaylistById('pl-batch');
+      expect(updatedPlaylist?.songIds.length, 2);
+    });
+
+    test('fetchAndSaveLyrics should find online lyrics and update song in repo and state', () async {
+      final now = DateTime.now();
+      final song = Song(
+        id: 'coldplay-1',
+        title: 'Yellow',
+        artist: 'Coldplay',
+        lyrics: '',
+        createdAt: now,
+        updatedAt: now,
+      );
+      await repository.saveSong(song);
+      await notifier.loadSongs();
+
+      final success = await notifier.fetchAndSaveLyrics('coldplay-1');
+      expect(success, isTrue);
+
+      final updated = await repository.getSongById('coldplay-1');
+      expect(updated?.lyrics, 'Look at the stars...');
     });
 
     test('updateLyrics should modify song lyrics', () async {
