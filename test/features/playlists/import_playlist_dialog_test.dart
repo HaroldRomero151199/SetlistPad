@@ -92,5 +92,46 @@ void main() {
 
       expect(find.text('Select All'), findsOneWidget);
     });
+    testWidgets('duplicate tracks can be selected and deselected independently by index', (tester) async {
+      final sampleMetadata = YouTubePlaylistMetadata(
+        id: 'PLDupTest',
+        title: 'Duplicate Tracks Playlist',
+        items: [
+          YouTubePlaylistItem(
+            videoId: 'v1',
+            title: 'Song One',
+            artist: 'Band A',
+            rawTitle: 'Song One',
+            url: 'https://youtube.com/watch?v=v1',
+          ),
+          YouTubePlaylistItem(
+            videoId: 'v1',
+            title: 'Song One Reprise',
+            artist: 'Band A',
+            rawTitle: 'Song One Reprise',
+            url: 'https://youtube.com/watch?v=v1',
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          ImportPlaylistDialog(initialMetadata: sampleMetadata),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final checkboxes = find.byType(Checkbox);
+      expect(checkboxes, findsNWidgets(3));
+
+      expect(find.text('2 Songs'), findsOneWidget);
+
+      // Tap first item checkbox
+      await tester.tap(checkboxes.at(1));
+      await tester.pumpAndSettle();
+
+      // Only one item remains selected, proving independence
+      expect(find.text('1 Song'), findsOneWidget);
+    });
   });
 }

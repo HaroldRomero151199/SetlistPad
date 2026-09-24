@@ -38,7 +38,7 @@ class _ImportPlaylistDialogState extends ConsumerState<ImportPlaylistDialog> {
   String? _errorMessage;
 
   YouTubePlaylistMetadata? _metadata;
-  final Set<String> _selectedVideoIds = {};
+  final Set<int> _selectedIndices = {};
   bool _createPlaylist = true;
 
   @override
@@ -70,9 +70,9 @@ class _ImportPlaylistDialogState extends ConsumerState<ImportPlaylistDialog> {
     setState(() {
       _metadata = meta;
       _playlistNameController.text = _getUniqueName(meta.title);
-      _selectedVideoIds.clear();
-      for (final item in meta.items) {
-        _selectedVideoIds.add(item.videoId);
+      _selectedIndices.clear();
+      for (int i = 0; i < meta.items.length; i++) {
+        _selectedIndices.add(i);
       }
       _isLoading = false;
       _errorMessage = null;
@@ -119,33 +119,34 @@ class _ImportPlaylistDialogState extends ConsumerState<ImportPlaylistDialog> {
   void _toggleSelectAll() {
     setState(() {
       if (_metadata == null) return;
-      if (_selectedVideoIds.length == _metadata!.items.length) {
-        _selectedVideoIds.clear();
+      if (_selectedIndices.length == _metadata!.items.length) {
+        _selectedIndices.clear();
       } else {
-        _selectedVideoIds.clear();
-        for (final item in _metadata!.items) {
-          _selectedVideoIds.add(item.videoId);
+        _selectedIndices.clear();
+        for (int i = 0; i < _metadata!.items.length; i++) {
+          _selectedIndices.add(i);
         }
       }
     });
   }
 
-  void _toggleItem(String videoId) {
+  void _toggleItem(int index) {
     setState(() {
-      if (_selectedVideoIds.contains(videoId)) {
-        _selectedVideoIds.remove(videoId);
+      if (_selectedIndices.contains(index)) {
+        _selectedIndices.remove(index);
       } else {
-        _selectedVideoIds.add(videoId);
+        _selectedIndices.add(index);
       }
     });
   }
 
   Future<void> _handleImport() async {
-    if (_metadata == null || _selectedVideoIds.isEmpty) return;
+    if (_metadata == null || _selectedIndices.isEmpty) return;
 
-    final selectedItems = _metadata!.items
-        .where((item) => _selectedVideoIds.contains(item.videoId))
-        .toList();
+    final selectedItems = [
+      for (int i = 0; i < _metadata!.items.length; i++)
+        if (_selectedIndices.contains(i)) _metadata!.items[i],
+    ];
 
     setState(() {
       _isImporting = true;
@@ -249,7 +250,7 @@ class _ImportPlaylistDialogState extends ConsumerState<ImportPlaylistDialog> {
                       )
                     : ImportPlaylistPreviewView(
                         metadata: _metadata!,
-                        selectedVideoIds: _selectedVideoIds,
+                        selectedIndices: _selectedIndices,
                         playlistNameController: _playlistNameController,
                         createPlaylist: _createPlaylist,
                         onCreatePlaylistChanged: (val) {

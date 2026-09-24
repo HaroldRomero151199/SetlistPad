@@ -58,7 +58,10 @@ class YouTubeClient {
       );
 
       if (webResponse.statusCode == 200) {
-        final parsed = _parseYtInitialData(webResponse.body, playlistId);
+        final parsed = await _fetchAndParseWebPlaylist(
+          webResponse.body,
+          playlistId,
+        );
         if (parsed != null && parsed.tracks.isNotEmpty) {
           return parsed;
         }
@@ -89,10 +92,10 @@ class YouTubeClient {
     );
   }
 
-  YouTubePlaylistResponse? _parseYtInitialData(
+  Future<YouTubePlaylistResponse?> _fetchAndParseWebPlaylist(
     String html,
     String playlistId,
-  ) {
+  ) async {
     final regex = RegExp(
       r'var ytInitialData\s*=\s*({.*?});</script>|ytInitialData\s*=\s*({.*?});',
       dotAll: true,
@@ -131,6 +134,34 @@ class YouTubeClient {
       final tracks = <YouTubePlaylistTrackItem>[];
       _collectPlaylistVideoRenderers(data, tracks);
 
+      // Extract Innertube API Key from HTML if present
+      final keyRegex = RegExp(
+        r'"INNERTUBE_API_KEY":\s*"([^"]+)"|"innertubeApiKey":\s*"([^"]+)"',
+      );
+      final keyMatch = keyRegex.firstMatch(html);
+      final apiKey = keyMatch?.group(1) ?? keyMatch?.group(2);
+
+      // Follow pagination / continuation tokens to avoid silent truncation of long playlists
+      var continuationToken = _extractContinuationToken(data);
+      final seenTokens = <String>{};
+      int pageCount = 0;
+      const maxPages = 25; // Safely supports up to ~2,500 tracks
+
+      while (continuationToken != null &&
+          continuationToken.isNotEmpty &&
+          !seenTokens.contains(continuationToken) &&
+          pageCount < maxPages) {
+        seenTokens.add(continuationToken);
+        pageCount++;
+
+        final nextToken = await _fetchContinuationPage(
+          continuationToken: continuationToken,
+          apiKey: apiKey,
+          tracks: tracks,
+        );
+        continuationToken = nextToken;
+      }
+
       return YouTubePlaylistResponse(
         playlistId: playlistId,
         title: title,
@@ -140,6 +171,86 @@ class YouTubeClient {
     } catch (_) {
       return null;
     }
+  }
+
+  Future<String?> _fetchContinuationPage({
+    required String continuationToken,
+    required String? apiKey,
+    required List<YouTubePlaylistTrackItem> tracks,
+  }) async {
+    try {
+      final browseUri = Uri.parse(ApiConfig.youtubeiBrowseUrl).replace(
+        queryParameters: (apiKey != null && apiKey.isNotEmpty)
+            ? {'key': apiKey}
+            : null,
+      );
+
+      final response = await _client.post(
+        browseUri,
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+        body: jsonEncode({
+          'context': {
+            'client': {
+              'clientName': 'WEB',
+              'clientVersion': '2.20240101.00.00',
+            },
+          },
+          'continuation': continuationToken,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        return null;
+      }
+
+      final pageData = jsonDecode(response.body);
+      _collectPlaylistVideoRenderers(pageData, tracks);
+      return _extractContinuationToken(pageData);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? _extractContinuationToken(dynamic node) {
+    if (node is Map<String, dynamic>) {
+      if (node.containsKey('continuationItemRenderer')) {
+        final cir = node['continuationItemRenderer'];
+        if (cir is Map<String, dynamic>) {
+          final endpoint = cir['continuationEndpoint'];
+          if (endpoint is Map<String, dynamic>) {
+            final cmd = endpoint['continuationCommand'];
+            if (cmd is Map<String, dynamic> && cmd['token'] is String) {
+              return cmd['token'] as String;
+            }
+          }
+        }
+      }
+      if (node.containsKey('continuationCommand')) {
+        final cmd = node['continuationCommand'];
+        if (cmd is Map<String, dynamic> && cmd['token'] is String) {
+          return cmd['token'] as String;
+        }
+      }
+      for (final val in node.values) {
+        final token = _extractContinuationToken(val);
+        if (token != null && token.isNotEmpty) {
+          return token;
+        }
+      }
+    } else if (node is List) {
+      for (final item in node) {
+        final token = _extractContinuationToken(item);
+        if (token != null && token.isNotEmpty) {
+          return token;
+        }
+      }
+    }
+    return null;
   }
 
   void _collectPlaylistVideoRenderers(

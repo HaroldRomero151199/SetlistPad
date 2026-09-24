@@ -6,12 +6,12 @@ import '../widgets/import_playlist_track_tile.dart';
 /// View displaying the fetched YouTube playlist items, selection controls, and name editor.
 class ImportPlaylistPreviewView extends StatelessWidget {
   final YouTubePlaylistMetadata metadata;
-  final Set<String> selectedVideoIds;
+  final Set<int> selectedIndices;
   final TextEditingController playlistNameController;
   final bool createPlaylist;
   final ValueChanged<bool?> onCreatePlaylistChanged;
   final VoidCallback onToggleSelectAll;
-  final ValueChanged<String> onToggleItem;
+  final ValueChanged<int> onToggleItem;
   final String? errorMessage;
   final VoidCallback onCancel;
   final VoidCallback onImport;
@@ -19,7 +19,7 @@ class ImportPlaylistPreviewView extends StatelessWidget {
   const ImportPlaylistPreviewView({
     super.key,
     required this.metadata,
-    required this.selectedVideoIds,
+    required this.selectedIndices,
     required this.playlistNameController,
     required this.createPlaylist,
     required this.onCreatePlaylistChanged,
@@ -33,7 +33,7 @@ class ImportPlaylistPreviewView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final allSelected = selectedVideoIds.length == metadata.items.length;
+    final allSelected = selectedIndices.length == metadata.items.length;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -100,7 +100,7 @@ class ImportPlaylistPreviewView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              context.l10n.songsCount(selectedVideoIds.length),
+              context.l10n.songsCount(selectedIndices.length),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -128,13 +128,13 @@ class ImportPlaylistPreviewView extends StatelessWidget {
             separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final item = metadata.items[index];
-              final isSelected = selectedVideoIds.contains(item.videoId);
+              final isSelected = selectedIndices.contains(index);
 
               return ImportPlaylistTrackTile(
                 item: item,
                 index: index,
                 isSelected: isSelected,
-                onChanged: (_) => onToggleItem(item.videoId),
+                onChanged: (_) => onToggleItem(index),
               );
             },
           ),
@@ -156,13 +156,13 @@ class ImportPlaylistPreviewView extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             ElevatedButton(
-              onPressed: selectedVideoIds.isEmpty ? null : onImport,
+              onPressed: selectedIndices.isEmpty ? null : onImport,
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
               ),
               child: Text(
-                context.l10n.importSelectedSongs(selectedVideoIds.length),
+                context.l10n.importSelectedSongs(selectedIndices.length),
               ),
             ),
           ],

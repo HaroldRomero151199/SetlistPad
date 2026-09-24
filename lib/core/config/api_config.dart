@@ -16,4 +16,6 @@ abstract final class ApiConfig {
   static const String youtubePlaylistBaseUrl = 'https://www.youtube.com/playlist';
   static const String youtubeFeedsVideosUrl =
       'https://www.youtube.com/feeds/videos.xml';
+  static const String youtubeiBrowseUrl =
+      'https://www.youtube.com/youtubei/v1/browse';
 }
