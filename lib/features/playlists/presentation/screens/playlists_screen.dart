@@ -31,8 +31,13 @@ class PlaylistsScreen extends ConsumerWidget {
                     border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
+                    final trimmed = value?.trim() ?? '';
+                    if (trimmed.isEmpty) {
                       return dialogContext.l10n.playlistNameRequired;
+                    }
+                    final existing = ref.read(playlistsNotifierProvider).value ?? [];
+                    if (existing.any((p) => p.name.toLowerCase() == trimmed.toLowerCase())) {
+                      return dialogContext.l10n.playlistAlreadyExists;
                     }
                     return null;
                   },
@@ -78,6 +83,7 @@ class PlaylistsScreen extends ConsumerWidget {
   void _showImportPlaylistDialog(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => const ImportPlaylistDialog(),
     );
   }

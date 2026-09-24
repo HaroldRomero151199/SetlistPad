@@ -302,5 +302,13 @@
   "noLyricsFoundOnline": "No lyrics found online for this song.",
   "@noLyricsFoundOnline": {
     "description": "Message when online lyrics search yields no result"
+  },
+  "playlistAlreadyExists": "A playlist with this name already exists",
+  "@playlistAlreadyExists": {
+    "description": "Error message when creating a playlist with a duplicate name"
+  },
+  "hideDialog": "Run in background",
+  "@hideDialog": {
+    "description": "Button to dismiss import dialog while letting import finish in background"
   }
 }

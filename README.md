@@ -1,93 +1,84 @@
-# SetlistPad
-<p align="center">
-  <img src="2fedea49-5ce6-48d8-875f-05184706909c.jpg" alt="Banner de SetlistPad" width="100%">
-</p>
-**SetlistPad** is a Flutter application designed to help musicians, singers, and music enthusiasts manage and organize their song lyrics in one place.
+# SetlistPad 🎵
 
-## Features
+A modern, offline-first Flutter application tailored for live musicians and bands to manage songs, chords, lyrics, and gig setlists seamlessly.
 
-- 🎵 **Song Management**: Create, edit, and organize songs with complete metadata
-- 📋 **Lyrics Display**: Access and view song lyrics with a clean, readable interface
-- 🔍 **Search Functionality**: Easily find songs and lyrics
-- 💾 **Local Storage**: Offline access to your song library with Hive
-- 🎨 **Modern Design**: Intuitive and responsive user interface
+---
 
-## Architecture
+## ✨ Features
 
-The project follows a **Feature-First + Clean Architecture** pattern:
+- **Offline-First Storage**: Fast and reliable local persistence powered by **Hive**.
+- **YouTube Playlist & Song Import**:
+  - Direct import from YouTube playlist or video URLs.
+  - Automated title and artist cleaning stripping redundant video tags (e.g. `[Official Video]`, `(Live @ Festival 2024)`).
+  - Collision prevention avoiding duplicate playlist names.
+  - Progressive background import displaying added songs in real time.
+- **Intelligent Online Lyrics Engine**:
+  - Two-stage multi-source lyrics lookup via **LRCLIB** and **Lyrics.ovh**.
+  - Advanced fuzzy matching scoring candidates using token overlap and Levenshtein similarity.
+- **Stage-Ready Performance Viewer**:
+  - Monospace font typography ensuring chord alignment over lyrics.
+  - Dynamic font scale controls for stage readability.
+  - Full-screen distraction-free layout.
+- **Internationalization (i18n)**:
+  - English and Spanish localizations with automatic locale detection.
 
-```
+---
+
+## 🏛️ Architecture & Directory Layout
+
+SetlistPad adheres strictly to **Clean Architecture** and **Vertical Slicing**:
+
+```text
 lib/
-├── core/
-│   ├── clients/       # HTTP clients and DTO models
-│   ├── config/        # Global configuration and constants
-│   ├── providers/     # Dependency injection with Riverpod
-│   ├── services/      # Business logic services
-│   └── theme/         # Themes and typography
+├── core/                   # Shared cross-cutting modules (clients, services, theme, config)
 ├── features/
-│   ├── songs/         # Songs feature module
-│   └── playlists/     # Playlists feature module
-└── main.dart
+│   ├── playlists/          # Playlists domain, repository, screens, views, widgets, and utils
+│   └── songs/              # Songs domain, repository, screens, and widgets
+└── l10n/                   # ARB localization definitions and generated classes
 ```
 
-## Tech Stack
+For comprehensive guidelines and architectural specifications, consult:
+- 📖 [AGENTS.md](AGENTS.md) — Architectural entry point and developer rules.
+- 📖 [Playlists Feature Documentation](docs/FEATURE_PLAYLISTS.md)
+- 📖 [Songs Feature Documentation](docs/FEATURE_SONGS.md)
+- 📖 [Core Architecture Documentation](docs/CORE_ARCHITECTURE.md)
+- 📖 [Lyrics Engine & Scraper Deep Dive](docs/LYRICS_ENGINE_AND_PLAYLIST_IMPORT.md)
 
-- **Framework**: Flutter 3.x
-- **State Management**: Flutter Riverpod 2.x
-- **Local Database**: Hive
-- **HTTP Client**: http
-- **Language**: Dart with strong typing
+---
 
-## Requirements
+## 🚀 Getting Started
 
-- Flutter 3.0 or higher
-- Dart 3.0 or higher
-- iOS 11.0+ / Android 5.0+
+### Prerequisites
+- Flutter SDK `>=3.3.0`
+- Dart SDK `>=3.3.0`
 
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/HaroldRomero151199/SetlistPad.git
-   cd SetlistPad
-   ```
-
-2. Install dependencies:
-   ```bash
-   flutter pub get
-   ```
-
-3. Run the application:
-   ```bash
-   flutter run
-   ```
-
-## Development
-
-### Code Analysis
+### Installation
 ```bash
-flutter analyze
+# Clone the repository
+git clone https://github.com/your-username/SetlistPad.git
+
+# Navigate to project directory
+cd SetlistPad
+
+# Fetch dependencies
+flutter pub get
+
+# Generate localizations and Hive adapters
+flutter gen-l10n
+dart run build_runner build --delete-conflicting-outputs
+
+# Run tests
+flutter test
+
+# Run application
+flutter run
 ```
 
-### Run Tests
+---
+
+## 🧪 Testing
+
+The test suite covers unit and widget tests across all domain layers:
 ```bash
 flutter test
 ```
-
-### Build for Production
-```bash
-flutter build apk      # Android
-flutter build ios      # iOS
-```
-
-## Development Guidelines
-
-See [`AGENTS.md`](./AGENTS.md) for mandatory development rules, architectural patterns, and best practices.
-
-## License
-
-This project is licensed under the MIT License.
-
-## Author
-
-[Harold Romero](https://github.com/HaroldRomero151199)

@@ -129,15 +129,15 @@ class SongsNotifier extends Notifier<AsyncValue<List<Song>>> {
           await plRepo.addSongToPlaylist(targetPlaylistId, song.id);
         }
       }
-    }
 
-    await loadSongs();
-
-    if (targetPlaylistId != null) {
-      try {
-        await ref.read(playlistsNotifierProvider.notifier).loadPlaylists();
-      } catch (_) {
-        // Safe fallback in isolated test setups
+      // Proactively update state so songs and playlists reflect progressively in UI
+      await loadSongs();
+      if (targetPlaylistId != null) {
+        try {
+          await ref.read(playlistsNotifierProvider.notifier).loadPlaylists();
+        } catch (_) {
+          // Safe fallback in isolated test setups
+        }
       }
     }
 

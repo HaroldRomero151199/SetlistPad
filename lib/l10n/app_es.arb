@@ -65,5 +65,13 @@
   "searchLyricsOnline": "Buscar letra en línea",
   "searchingLyrics": "Buscando letra...",
   "lyricsFoundSuccess": "¡Letra encontrada y actualizada!",
-  "noLyricsFoundOnline": "No se encontró la letra en línea para esta canción."
+  "noLyricsFoundOnline": "No se encontró la letra en línea para esta canción.",
+  "playlistAlreadyExists": "Ya existe una lista con este nombre",
+  "@playlistAlreadyExists": {
+    "description": "Error message when creating a playlist with a duplicate name"
+  },
+  "hideDialog": "Continuar en segundo plano",
+  "@hideDialog": {
+    "description": "Button to dismiss import dialog while letting import finish in background"
+  }
 }

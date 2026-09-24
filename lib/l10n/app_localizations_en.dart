@@ -262,4 +262,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noLyricsFoundOnline => 'No lyrics found online for this song.';
+
+  @override
+  String get playlistAlreadyExists =>
+      'A playlist with this name already exists';
+
+  @override
+  String get hideDialog => 'Run in background';
 }

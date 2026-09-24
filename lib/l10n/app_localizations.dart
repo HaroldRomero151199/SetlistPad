@@ -493,6 +493,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No lyrics found online for this song.'**
   String get noLyricsFoundOnline;
+
+  /// Error message when creating a playlist with a duplicate name
+  ///
+  /// In en, this message translates to:
+  /// **'A playlist with this name already exists'**
+  String get playlistAlreadyExists;
+
+  /// Button to dismiss import dialog while letting import finish in background
+  ///
+  /// In en, this message translates to:
+  /// **'Run in background'**
+  String get hideDialog;
 }
 
 class _AppLocalizationsDelegate
