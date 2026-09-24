@@ -6,6 +6,16 @@ import 'package:setlist_pad/core/services/services.dart';
 import 'package:setlist_pad/features/playlists/playlists.dart';
 import 'package:setlist_pad/features/songs/songs.dart';
 
+class FakeLyricsService extends LyricsService {
+  @override
+  Future<String?> fetchLyrics({required String title, required String artist}) async {
+    if (title.contains('Yellow')) {
+      return 'Look at the stars...';
+    }
+    return null;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Box<Song> songBox;
@@ -25,7 +35,7 @@ void main() {
 
     repository = HiveSongRepository(songBox: songBox);
     youtubeService = YouTubeService();
-    lyricsService = LyricsService();
+    lyricsService = FakeLyricsService();
 
     container = ProviderContainer(
       overrides: [
@@ -40,8 +50,8 @@ void main() {
 
   tearDown(() async {
     container.dispose();
+    await songBox.clear();
     await songBox.close();
-    // Box closed cleanly without Windows file lock
   });
 
   group('SongsNotifier Tests', () {
@@ -112,6 +122,26 @@ void main() {
 
       final updatedPlaylist = await fakePlaylistRepo.getPlaylistById('pl-batch');
       expect(updatedPlaylist?.songIds.length, 2);
+    });
+
+    test('fetchAndSaveLyrics should find online lyrics and update song in repo and state', () async {
+      final now = DateTime.now();
+      final song = Song(
+        id: 'coldplay-1',
+        title: 'Yellow',
+        artist: 'Coldplay',
+        lyrics: '',
+        createdAt: now,
+        updatedAt: now,
+      );
+      await repository.saveSong(song);
+      await notifier.loadSongs();
+
+      final success = await notifier.fetchAndSaveLyrics('coldplay-1');
+      expect(success, isTrue);
+
+      final updated = await repository.getSongById('coldplay-1');
+      expect(updated?.lyrics, 'Look at the stars...');
     });
 
     test('updateLyrics should modify song lyrics', () async {

@@ -7,6 +7,9 @@ abstract final class ApiConfig {
   static const String appUserAgent =
       'SetlistPad/1.0 (https://github.com/HaroldRomero151199/SetlistPad)';
 
+  // Lyrics.ovh API Configuration (fallback open lyrics provider)
+  static const String lyricsOvhBaseUrl = 'https://api.lyrics.ovh/v1';
+
   // YouTube API Configuration
   static const String youtubeOembedBaseUrl = 'https://www.youtube.com/oembed';
   static const String youtubeWatchBaseUrl = 'https://www.youtube.com/watch';

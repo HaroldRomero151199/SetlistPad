@@ -469,6 +469,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid YouTube playlist URL.'**
   String get errorInvalidPlaylistUrl;
+
+  /// Button label to search lyrics online for a song
+  ///
+  /// In en, this message translates to:
+  /// **'Search Lyrics Online'**
+  String get searchLyricsOnline;
+
+  /// Loading state text while searching for lyrics online
+  ///
+  /// In en, this message translates to:
+  /// **'Searching lyrics...'**
+  String get searchingLyrics;
+
+  /// Success message when online lyrics are found and updated
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics found and updated!'**
+  String get lyricsFoundSuccess;
+
+  /// Message when online lyrics search yields no result
+  ///
+  /// In en, this message translates to:
+  /// **'No lyrics found online for this song.'**
+  String get noLyricsFoundOnline;
 }
 
 class _AppLocalizationsDelegate

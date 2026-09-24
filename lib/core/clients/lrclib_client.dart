@@ -31,11 +31,14 @@ class LrclibClient {
     return null;
   }
 
-  /// Searches lyrics with a query using [SearchLyricsRequest].
+  /// Searches lyrics with a query or field parameters using [SearchLyricsRequest].
   /// Returns a list of [LrclibResponse], or an empty list if none found.
   Future<List<LrclibResponse>> searchLyrics(SearchLyricsRequest request) async {
+    final queryParams = request.toQueryParameters();
+    if (queryParams.isEmpty) return [];
+
     final searchUri = Uri.parse('${ApiConfig.lrclibBaseUrl}${ApiConfig.lrclibSearchPath}').replace(
-      queryParameters: request.toQueryParameters(),
+      queryParameters: queryParams,
     );
 
     try {

@@ -286,5 +286,21 @@
   "errorInvalidPlaylistUrl": "Invalid YouTube playlist URL.",
   "@errorInvalidPlaylistUrl": {
     "description": "Error message when playlist URL is invalid"
+  },
+  "searchLyricsOnline": "Search Lyrics Online",
+  "@searchLyricsOnline": {
+    "description": "Button label to search lyrics online for a song"
+  },
+  "searchingLyrics": "Searching lyrics...",
+  "@searchingLyrics": {
+    "description": "Loading state text while searching for lyrics online"
+  },
+  "lyricsFoundSuccess": "Lyrics found and updated!",
+  "@lyricsFoundSuccess": {
+    "description": "Success message when online lyrics are found and updated"
+  },
+  "noLyricsFoundOnline": "No lyrics found online for this song.",
+  "@noLyricsFoundOnline": {
+    "description": "Message when online lyrics search yields no result"
   }
 }

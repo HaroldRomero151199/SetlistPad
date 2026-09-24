@@ -251,4 +251,17 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get errorInvalidPlaylistUrl =>
       'URL de lista de reproducción de YouTube no válida.';
+
+  @override
+  String get searchLyricsOnline => 'Buscar letra en línea';
+
+  @override
+  String get searchingLyrics => 'Buscando letra...';
+
+  @override
+  String get lyricsFoundSuccess => '¡Letra encontrada y actualizada!';
+
+  @override
+  String get noLyricsFoundOnline =>
+      'No se encontró la letra en línea para esta canción.';
 }

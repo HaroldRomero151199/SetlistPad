@@ -250,4 +250,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorInvalidPlaylistUrl => 'Invalid YouTube playlist URL.';
+
+  @override
+  String get searchLyricsOnline => 'Search Lyrics Online';
+
+  @override
+  String get searchingLyrics => 'Searching lyrics...';
+
+  @override
+  String get lyricsFoundSuccess => 'Lyrics found and updated!';
+
+  @override
+  String get noLyricsFoundOnline => 'No lyrics found online for this song.';
 }

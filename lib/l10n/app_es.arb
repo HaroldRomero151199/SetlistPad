@@ -61,5 +61,9 @@
   "playlistImportSuccess": "{count, plural, =1{Se importó 1 canción de la lista} other{Se importaron {count} canciones de la lista}}",
   "errorPlaylistEmpty": "La lista de reproducción está vacía, es privada o no se pudo cargar.",
   "errorFetchingPlaylist": "No se pudo obtener las canciones de la lista. Verifica el enlace y tu conexión.",
-  "errorInvalidPlaylistUrl": "URL de lista de reproducción de YouTube no válida."
+  "errorInvalidPlaylistUrl": "URL de lista de reproducción de YouTube no válida.",
+  "searchLyricsOnline": "Buscar letra en línea",
+  "searchingLyrics": "Buscando letra...",
+  "lyricsFoundSuccess": "¡Letra encontrada y actualizada!",
+  "noLyricsFoundOnline": "No se encontró la letra en línea para esta canción."
 }
