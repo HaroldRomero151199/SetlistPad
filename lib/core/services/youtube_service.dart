@@ -1,14 +1,18 @@
-import '../clients/models/youtube_models.dart';
-import '../clients/youtube_client.dart';
-import '../config/api_config.dart';
+import '../clients/clients.dart';
 import 'models/youtube_metadata.dart';
 import 'models/youtube_playlist_item.dart';
 import 'models/youtube_playlist_metadata.dart';
+import 'utils/track_title_sanitizer.dart';
 
 class YouTubeService {
   final YouTubeClient client;
+  final TrackTitleSanitizer sanitizer;
 
-  YouTubeService({YouTubeClient? client}) : client = client ?? YouTubeClient();
+  YouTubeService({
+    YouTubeClient? client,
+    TrackTitleSanitizer? sanitizer,
+  })  : client = client ?? YouTubeClient(),
+        sanitizer = sanitizer ?? const TrackTitleSanitizer();
 
   /// Extracts YouTube Video ID from various URL formats, including Shorts and Live
   String? extractVideoId(String url) {
@@ -84,7 +88,7 @@ class YouTubeService {
       throw const FormatException('Invalid YouTube URL format');
     }
 
-    final canonicalUrl = '${ApiConfig.youtubeWatchBaseUrl}?v=$videoId';
+    final canonicalUrl = '\${ApiConfig.youtubeWatchBaseUrl}?v=\$videoId';
     final oembedResponse = await client.fetchOEmbedData(
       YouTubeOembedRequest(url: canonicalUrl),
     );
@@ -104,29 +108,8 @@ class YouTubeService {
     );
   }
 
-  /// Helper to parse "Artist - Song Title (Official Video)" into artist and title
+  /// Parses raw video title and channel/author into clean artist and title using [TrackTitleSanitizer]
   Map<String, String> parseTitleAndArtist(String rawTitle, String fallbackAuthor) {
-    // Clean common suffixes like (Official Video), [MV], (Lyric Video), etc.
-    String cleanTitle = rawTitle
-        .replaceAll(RegExp(r'\s*[\(\[](Official|Lyric|Music|Audio|HD|4K|\d{4}).*?[\)\]]', caseSensitive: false), '')
-        .trim();
-
-    // Look for a deliberate artist - title separator: whitespace around hyphen, en-dash, or em-dash
-    final delimiterRegex = RegExp(r'\s+[-–—]\s+');
-    final delimiterMatch = delimiterRegex.firstMatch(cleanTitle);
-
-    if (delimiterMatch != null) {
-      final artistPart = cleanTitle.substring(0, delimiterMatch.start).trim();
-      final titlePart = cleanTitle.substring(delimiterMatch.end).trim();
-      if (artistPart.isNotEmpty && titlePart.isNotEmpty) {
-        return {'artist': artistPart, 'title': titlePart};
-      }
-    }
-
-    // Fallback: author is channel name, cleanTitle is title
-    String artist = fallbackAuthor.replaceAll(RegExp(r'VEVO$', caseSensitive: false), '').trim();
-    if (artist.isEmpty) artist = 'Unknown Artist';
-
-    return {'artist': artist, 'title': cleanTitle.isEmpty ? rawTitle : cleanTitle};
+    return sanitizer.parse(rawTitle, fallbackAuthor);
   }
 }
