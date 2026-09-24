@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:setlist_pad/core/clients/models/lrclib_models.dart';
+import 'package:setlist_pad/core/clients/clients.dart';
 import 'package:setlist_pad/core/services/utils/candidate_match_scorer.dart';
 
 void main() {

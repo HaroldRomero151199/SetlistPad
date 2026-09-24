@@ -24,11 +24,31 @@ final lrclibClientProvider = Provider<LrclibClient>((ref) {
   return LrclibClient();
 });
 
-// Domain Services Providers (Injecting Clients)
+final lyricsOvhClientProvider = Provider<LyricsOvhClient>((ref) {
+  return LyricsOvhClient();
+});
+
+final candidateMatchScorerProvider = Provider<CandidateMatchScorer>((ref) {
+  return const CandidateMatchScorer();
+});
+
+final trackTitleSanitizerProvider = Provider<TrackTitleSanitizer>((ref) {
+  return const TrackTitleSanitizer();
+});
+
+// Domain Services Providers (Injecting Clients and Utilities)
 final youtubeServiceProvider = Provider<YouTubeService>((ref) {
-  return YouTubeService(client: ref.watch(youtubeClientProvider));
+  return YouTubeService(
+    client: ref.watch(youtubeClientProvider),
+    sanitizer: ref.watch(trackTitleSanitizerProvider),
+  );
 });
 
 final lyricsServiceProvider = Provider<LyricsService>((ref) {
-  return LyricsService(client: ref.watch(lrclibClientProvider));
+  return LyricsService(
+    lrclibClient: ref.watch(lrclibClientProvider),
+    lyricsOvhClient: ref.watch(lyricsOvhClientProvider),
+    matchScorer: ref.watch(candidateMatchScorerProvider),
+    sanitizer: ref.watch(trackTitleSanitizerProvider),
+  );
 });

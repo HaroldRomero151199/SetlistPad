@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../config/api_config.dart';
+import '../../config/api_config.dart';
 import 'models/lyrics_ovh_response.dart';
 
 /// HTTP client for fetching lyrics from the open Lyrics.ovh API.

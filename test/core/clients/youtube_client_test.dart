@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:setlist_pad/core/clients/models/youtube_models.dart';
-import 'package:setlist_pad/core/clients/youtube_client.dart';
+import 'package:setlist_pad/core/clients/clients.dart';
 
 void main() {
   group('YouTubeClient Tests', () {

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../config/api_config.dart';
-import 'models/lrclib_models.dart';
+import '../../config/api_config.dart';
+import 'models/get_lyrics_request.dart';
+import 'models/lrclib_response.dart';
+import 'models/search_lyrics_request.dart';
 
 /// HTTP client responsible for making direct requests to the LRCLIB API.
 class LrclibClient {
