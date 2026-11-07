@@ -4,6 +4,7 @@ export 'domain/services/playlist_sync_service.dart';
 export 'domain/services/playlist_sync_validator.dart';
 export 'data/repositories/playlist_repository.dart';
 export 'presentation/providers/playlists_notifier.dart';
+export 'presentation/providers/playlist_syncing_notifier.dart';
 export 'presentation/screens/playlists_screen.dart';
 export 'presentation/screens/playlist_detail_screen.dart';
 export 'presentation/utils/playlist_name_helper.dart';

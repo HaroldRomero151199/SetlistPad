@@ -156,7 +156,35 @@ void main() {
         );
       });
 
-      test('does not throw when metadata contains items', () {
+      test('throws Exception when metadata snapshot is marked incomplete', () {
+        final metadata = YouTubePlaylistMetadata(
+          id: 'pl-1',
+          title: 'Truncated Playlist',
+          items: [
+            YouTubePlaylistItem(
+              videoId: 'v1',
+              title: 'Song 1',
+              artist: 'Artist 1',
+              rawTitle: 'Artist 1 - Song 1',
+              url: 'https://youtube.com/watch?v=v1',
+            ),
+          ],
+          isComplete: false,
+        );
+
+        expect(
+          () => validator.validateMetadata(metadata),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Remote playlist snapshot is incomplete'),
+            ),
+          ),
+        );
+      });
+
+      test('does not throw when metadata contains items and is complete', () {
         final metadata = YouTubePlaylistMetadata(
           id: 'pl-1',
           title: 'Full Playlist',
@@ -169,6 +197,7 @@ void main() {
               url: 'https://youtube.com/watch?v=v1',
             ),
           ],
+          isComplete: true,
         );
 
         expect(() => validator.validateMetadata(metadata), returnsNormally);

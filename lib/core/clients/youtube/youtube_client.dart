@@ -146,6 +146,7 @@ class YouTubeClient {
       final seenTokens = <String>{};
       int pageCount = 0;
       const maxPages = 25; // Safely supports up to ~2,500 tracks
+      bool isComplete = true;
 
       while (continuationToken != null &&
           continuationToken.isNotEmpty &&
@@ -154,12 +155,21 @@ class YouTubeClient {
         seenTokens.add(continuationToken);
         pageCount++;
 
-        final nextToken = await _fetchContinuationPage(
-          continuationToken: continuationToken,
-          apiKey: apiKey,
-          tracks: tracks,
-        );
-        continuationToken = nextToken;
+        try {
+          final nextToken = await _fetchContinuationPage(
+            continuationToken: continuationToken,
+            apiKey: apiKey,
+            tracks: tracks,
+          );
+          continuationToken = nextToken;
+        } catch (_) {
+          isComplete = false;
+          break;
+        }
+      }
+
+      if (continuationToken != null && continuationToken.isNotEmpty) {
+        isComplete = false;
       }
 
       return YouTubePlaylistResponse(
@@ -167,6 +177,7 @@ class YouTubeClient {
         title: title,
         author: author,
         tracks: tracks,
+        isComplete: isComplete,
       );
     } catch (_) {
       return null;
@@ -178,44 +189,42 @@ class YouTubeClient {
     required String? apiKey,
     required List<YouTubePlaylistTrackItem> tracks,
   }) async {
-    try {
-      final browseUri = Uri.parse(ApiConfig.youtubeiBrowseUrl).replace(
-        queryParameters: (apiKey != null && apiKey.isNotEmpty)
-            ? {'key': apiKey}
-            : null,
-      );
+    final browseUri = Uri.parse(ApiConfig.youtubeiBrowseUrl).replace(
+      queryParameters: (apiKey != null && apiKey.isNotEmpty)
+          ? {'key': apiKey}
+          : null,
+    );
 
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      };
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    };
 
-      final response = await _client.post(
-        browseUri,
-        headers: headers,
-        body: jsonEncode({
-          'context': {
-            'client': {
-              'clientName': 'WEB',
-              'clientVersion': '2.20240101.00.00',
-            },
+    final response = await _client.post(
+      browseUri,
+      headers: headers,
+      body: jsonEncode({
+        'context': {
+          'client': {
+            'clientName': 'WEB',
+            'clientVersion': '2.20240101.00.00',
           },
-          'continuation': continuationToken,
-        }),
+        },
+        'continuation': continuationToken,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Failed to fetch continuation page: HTTP ${response.statusCode}',
       );
-
-      if (response.statusCode != 200) {
-        return null;
-      }
-
-      final pageData = jsonDecode(response.body);
-      _collectPlaylistVideoRenderers(pageData, tracks);
-      return _extractContinuationToken(pageData);
-    } catch (_) {
-      return null;
     }
+
+    final pageData = jsonDecode(response.body);
+    _collectPlaylistVideoRenderers(pageData, tracks);
+    return _extractContinuationToken(pageData);
   }
 
   String? _extractContinuationToken(dynamic node) {
@@ -361,6 +370,7 @@ class YouTubeClient {
       title: playlistTitle,
       author: playlistAuthor,
       tracks: tracks,
+      isComplete: entries.length < 15,
     );
   }
 

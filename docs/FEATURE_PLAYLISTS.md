@@ -21,7 +21,8 @@ lib/features/playlists/
 │       └── playlist_sync_validator.dart    # Pure validation rules for sync prerequisites & remote responses
 ├── presentation/
 │   ├── providers/
-│   │   └── playlists_notifier.dart         # Riverpod Notifier for reactive playlist state & sync
+│   │   ├── playlists_notifier.dart         # Riverpod Notifier for reactive playlist state & sync
+│   │   └── playlist_syncing_notifier.dart  # Riverpod Notifier tracking active in-flight sync IDs
 │   ├── screens/
 │   │   ├── playlists_screen.dart           # Primary screen (playlist cards, creation FAB, import action)
 │   │   └── playlist_detail_screen.dart     # Detailed playlist view (song ordering, track removal, sync action)

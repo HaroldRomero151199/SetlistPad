@@ -4,24 +4,20 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../songs/songs.dart';
 import '../../playlists.dart';
 
-class PlaylistDetailScreen extends ConsumerStatefulWidget {
+class PlaylistDetailScreen extends ConsumerWidget {
   final Playlist playlist;
 
   const PlaylistDetailScreen({super.key, required this.playlist});
 
-  @override
-  ConsumerState<PlaylistDetailScreen> createState() => _PlaylistDetailScreenState();
-}
+  Future<void> _syncPlaylist(
+    BuildContext context,
+    WidgetRef ref,
+    Playlist currentPlaylist,
+  ) async {
+    final syncingNotifier = ref.read(playlistSyncingProvider.notifier);
+    if (ref.read(playlistSyncingProvider).contains(currentPlaylist.id)) return;
 
-class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
-  bool _isSyncing = false;
-
-  Future<void> _syncPlaylist(Playlist currentPlaylist) async {
-    if (_isSyncing) return;
-    setState(() {
-      _isSyncing = true;
-    });
-
+    syncingNotifier.setSyncing(currentPlaylist.id, true);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
     final colorScheme = context.colorScheme;
@@ -30,8 +26,6 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
       final result = await ref
           .read(playlistsNotifierProvider.notifier)
           .syncPlaylist(currentPlaylist.id);
-
-      if (!mounted) return;
 
       final message = PlaylistSyncHelper.formatMessage(l10n, result);
       messenger.showSnackBar(
@@ -42,7 +36,6 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
       );
     } catch (e) {
       debugPrint('Error syncing playlist: $e');
-      if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(
           content: Text(l10n.errorSyncingPlaylist),
@@ -50,11 +43,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          _isSyncing = false;
-        });
-      }
+      syncingNotifier.setSyncing(currentPlaylist.id, false);
     }
   }
 
@@ -73,19 +62,24 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
             children: [
               Text(
                 modalContext.l10n.addSongToPlaylist,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Expanded(
                 child: songsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text(modalContext.l10n.errorPrefix(e.toString()))),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(
+                      child: Text(modalContext.l10n.errorPrefix(e.toString()))),
                   data: (allSongs) {
                     final currentPlaylistSongs = ref
-                        .watch(playlistsNotifierProvider)
-                        .value
-                        ?.firstWhere((p) => p.id == widget.playlist.id, orElse: () => widget.playlist)
-                        .songIds ?? [];
+                            .watch(playlistsNotifierProvider)
+                            .value
+                            ?.firstWhere((p) => p.id == playlist.id,
+                                orElse: () => playlist)
+                            .songIds ??
+                        [];
 
                     final availableSongs = allSongs
                         .where((s) => !currentPlaylistSongs.contains(s.id))
@@ -96,7 +90,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                         child: Text(
                           modalContext.l10n.noMoreSongsToAdd,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: modalContext.colorScheme.onSurfaceVariant),
+                          style: TextStyle(
+                              color: modalContext.colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -109,11 +104,12 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                           leading: const Icon(Icons.music_note),
                           title: Text(song.title),
                           subtitle: Text(song.artist),
-                          trailing: Icon(Icons.add_circle_outline, color: modalContext.colorScheme.primary),
+                          trailing: Icon(Icons.add_circle_outline,
+                              color: modalContext.colorScheme.primary),
                           onTap: () {
                             ref
                                 .read(playlistsNotifierProvider.notifier)
-                                .addSongToPlaylist(widget.playlist.id, song.id);
+                                .addSongToPlaylist(playlist.id, song.id);
                             Navigator.of(modalContext).pop();
                           },
                         );
@@ -130,19 +126,23 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final playlistsAsync = ref.watch(playlistsNotifierProvider);
     final songsAsync = ref.watch(songsNotifierProvider);
 
-    final currentPlaylist = playlistsAsync.whenData((playlists) => playlists.firstWhere(
-          (p) => p.id == widget.playlist.id,
-          orElse: () => widget.playlist,
-        )).value ?? widget.playlist;
+    final currentPlaylist = playlistsAsync
+            .whenData((playlists) => playlists.firstWhere(
+                  (p) => p.id == playlist.id,
+                  orElse: () => playlist,
+                ))
+            .value ??
+        playlist;
 
     final allSongsMap = songsAsync.value?.fold<Map<String, Song>>(
           {},
           (map, s) => map..[s.id] = s,
-        ) ?? {};
+        ) ??
+        {};
 
     final playlistSongs = currentPlaylist.songIds
         .map((id) => allSongsMap[id])
@@ -151,13 +151,15 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
 
     final hasYoutubeUrl = currentPlaylist.youtubePlaylistUrl != null &&
         currentPlaylist.youtubePlaylistUrl!.trim().isNotEmpty;
+    final isSyncing =
+        ref.watch(playlistSyncingProvider).contains(currentPlaylist.id);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(currentPlaylist.name),
         actions: [
           if (hasYoutubeUrl)
-            _isSyncing
+            isSyncing
                 ? const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
                     child: Center(
@@ -171,17 +173,25 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                 : IconButton(
                     icon: const Icon(Icons.sync),
                     tooltip: context.l10n.syncPlaylistTooltip,
-                    onPressed: () => _syncPlaylist(currentPlaylist),
+                    onPressed: () =>
+                        _syncPlaylist(context, ref, currentPlaylist),
                   ),
           IconButton(
-            icon: Icon(Icons.delete_outline, color: context.colorScheme.error),
+            icon: Icon(
+              Icons.delete_outline,
+              color: isSyncing
+                  ? context.colorScheme.onSurface.withValues(alpha: 0.38)
+                  : context.colorScheme.error,
+            ),
             tooltip: context.l10n.deletePlaylistTooltip,
-            onPressed: () {
-              ref
-                  .read(playlistsNotifierProvider.notifier)
-                  .deletePlaylist(currentPlaylist.id);
-              Navigator.of(context).pop();
-            },
+            onPressed: isSyncing
+                ? null
+                : () {
+                    ref
+                        .read(playlistsNotifierProvider.notifier)
+                        .deletePlaylist(currentPlaylist.id);
+                    Navigator.of(context).pop();
+                  },
           ),
         ],
       ),
@@ -193,7 +203,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 currentPlaylist.description,
-                style: TextStyle(color: context.colorScheme.onSurfaceVariant, fontSize: 14),
+                style: TextStyle(
+                    color: context.colorScheme.onSurfaceVariant, fontSize: 14),
               ),
             ),
           ],
@@ -221,7 +232,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                     child: Text(
                       context.l10n.noSongsInPlaylist,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: context.colorScheme.onSurfaceVariant),
+                      style:
+                          TextStyle(color: context.colorScheme.onSurfaceVariant),
                     ),
                   )
                 : ListView.builder(
@@ -237,11 +249,13 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                         title: Text(song.title),
                         subtitle: Text(song.artist),
                         trailing: IconButton(
-                          icon: Icon(Icons.remove_circle_outline, color: context.colorScheme.onSurfaceVariant),
+                          icon: Icon(Icons.remove_circle_outline,
+                              color: context.colorScheme.onSurfaceVariant),
                           onPressed: () {
                             ref
                                 .read(playlistsNotifierProvider.notifier)
-                                .removeSongFromPlaylist(currentPlaylist.id, song.id);
+                                .removeSongFromPlaylist(
+                                    currentPlaylist.id, song.id);
                           },
                         ),
                         onTap: () {

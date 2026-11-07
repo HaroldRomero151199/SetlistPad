@@ -48,14 +48,21 @@ class PlaylistSyncService {
     final allSongs = List<Song>.from(await songsRepo.getAllSongs());
     final newSongIds = await _resolveSongIds(metadata.items, allSongs, yt, songsRepo);
 
-    final updatedPlaylist = playlist!.copyWith(
+    // Revalidate that the playlist was not deleted while sync was in flight.
+    final currentPlaylist = await _playlistRepository.getPlaylistById(playlistId);
+    if (currentPlaylist == null) {
+      // Playlist was deleted concurrently; do not recreate or resurrect it.
+      return _calculateDiff(playlist!.songIds, newSongIds);
+    }
+
+    final updatedPlaylist = currentPlaylist.copyWith(
       songIds: newSongIds,
       updatedAt: DateTime.now(),
     );
 
     await _playlistRepository.savePlaylist(updatedPlaylist);
 
-    return _calculateDiff(playlist.songIds, newSongIds);
+    return _calculateDiff(playlist!.songIds, newSongIds);
   }
 
   Future<List<String>> _resolveSongIds(
@@ -137,13 +144,13 @@ class PlaylistSyncService {
   ) {
     final itemVideoId =
         ytService.extractVideoId(item.url) ?? (item.videoId.isNotEmpty ? item.videoId : null);
-    final itemTitle = item.title.trim().toLowerCase();
-    final itemArtist = item.artist.trim().toLowerCase();
+    final itemUrl = item.url.trim();
 
+    // Pass 1: Search exact video identity across the catalog (URL or Video ID).
     for (final song in existingSongs) {
-      if (song.youtubeUrl != null && song.youtubeUrl!.trim().isNotEmpty) {
-        final songUrl = song.youtubeUrl!.trim();
-        if (item.url.trim().isNotEmpty && songUrl == item.url.trim()) {
+      final songUrl = song.youtubeUrl?.trim();
+      if (songUrl != null && songUrl.isNotEmpty) {
+        if (itemUrl.isNotEmpty && songUrl == itemUrl) {
           return song;
         }
         final songVideoId = ytService.extractVideoId(songUrl);
@@ -151,7 +158,13 @@ class PlaylistSyncService {
           return song;
         }
       }
+    }
 
+    // Pass 2: Fallback to normalized title and artist match only if no video identity matched.
+    final itemTitle = item.title.trim().toLowerCase();
+    final itemArtist = item.artist.trim().toLowerCase();
+
+    for (final song in existingSongs) {
       if (song.title.trim().toLowerCase() == itemTitle &&
           song.artist.trim().toLowerCase() == itemArtist) {
         return song;

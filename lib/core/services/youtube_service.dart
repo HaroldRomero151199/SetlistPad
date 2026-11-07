@@ -78,6 +78,7 @@ class YouTubeService {
       title: response.title,
       author: response.author,
       items: items,
+      isComplete: response.isComplete,
     );
   }
 

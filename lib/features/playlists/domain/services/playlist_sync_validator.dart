@@ -37,12 +37,18 @@ class PlaylistSyncValidator {
     }
   }
 
-  /// Validates that the fetched remote playlist metadata contains playable items.
+  /// Validates that the fetched remote playlist metadata contains playable items
+  /// and is a complete snapshot before performing synchronization diffing.
   ///
-  /// Throws [Exception] if [metadata.items] is empty.
+  /// Throws:
+  /// - [Exception] if [metadata.items] is empty.
+  /// - [Exception] if [metadata.isComplete] is false (to prevent destructive unlinking on partial reads).
   void validateMetadata(YouTubePlaylistMetadata metadata) {
     if (metadata.items.isEmpty) {
       throw Exception('Playlist is empty or private');
+    }
+    if (!metadata.isComplete) {
+      throw Exception('Remote playlist snapshot is incomplete');
     }
   }
 }
