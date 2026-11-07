@@ -5,11 +5,13 @@ class YouTubePlaylistMetadata {
   final String title;
   final String? author;
   final List<YouTubePlaylistItem> items;
+  final bool isComplete;
 
   YouTubePlaylistMetadata({
     required this.id,
     required this.title,
     this.author,
     required this.items,
+    this.isComplete = true,
   });
 }

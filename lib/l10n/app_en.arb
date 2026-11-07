@@ -310,5 +310,56 @@
   "hideDialog": "Run in background",
   "@hideDialog": {
     "description": "Button to dismiss import dialog while letting import finish in background"
+  },
+  "syncPlaylistTooltip": "Sync playlist",
+  "@syncPlaylistTooltip": {
+    "description": "Tooltip for sync playlist action button in playlist detail"
+  },
+  "syncingPlaylist": "Syncing playlist...",
+  "@syncingPlaylist": {
+    "description": "Loading message when playlist synchronization is in progress"
+  },
+  "syncResultAddedAndRemoved": "+{added} {added, plural, =1{added} other{added}}, -{removed} {removed, plural, =1{removed} other{removed}}",
+  "@syncResultAddedAndRemoved": {
+    "description": "Message showing songs added and removed after syncing",
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultAdded": "+{added} {added, plural, =1{added} other{added}}",
+  "@syncResultAdded": {
+    "description": "Message showing songs added after syncing",
+    "placeholders": {
+      "added": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultRemoved": "-{removed} {removed, plural, =1{removed} other{removed}}",
+  "@syncResultRemoved": {
+    "description": "Message showing songs removed after syncing",
+    "placeholders": {
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultNoChanges": "Playlist is already up to date",
+  "@syncResultNoChanges": {
+    "description": "Message when sync completes with no changes"
+  },
+  "errorSyncingPlaylist": "Failed to sync playlist. Please check the URL and your connection.",
+  "@errorSyncingPlaylist": {
+    "description": "Error message when playlist synchronization fails"
+  },
+  "errorSingleVideoNotPlaylist": "This link is for a single song, not a playlist. You can import it from the Library tab.",
+  "@errorSingleVideoNotPlaylist": {
+    "description": "Error message when user enters a single video link instead of a playlist link"
   }
 }
+

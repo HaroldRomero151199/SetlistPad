@@ -6,12 +6,14 @@ class YouTubePlaylistResponse {
   final String title;
   final String? author;
   final List<YouTubePlaylistTrackItem> tracks;
+  final bool isComplete;
 
   const YouTubePlaylistResponse({
     required this.playlistId,
     required this.title,
     this.author,
     required this.tracks,
+    this.isComplete = true,
   });
 
   factory YouTubePlaylistResponse.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class YouTubePlaylistResponse {
       title: json['title'] as String? ?? 'YouTube Playlist',
       author: json['author'] as String?,
       tracks: tracksList,
+      isComplete: json['isComplete'] as bool? ?? true,
     );
   }
 
@@ -35,6 +38,7 @@ class YouTubePlaylistResponse {
       'title': title,
       if (author != null) 'author': author,
       'tracks': tracks.map((t) => t.toJson()).toList(),
+      'isComplete': isComplete,
     };
   }
 }

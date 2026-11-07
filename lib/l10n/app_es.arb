@@ -73,5 +73,56 @@
   "hideDialog": "Continuar en segundo plano",
   "@hideDialog": {
     "description": "Button to dismiss import dialog while letting import finish in background"
+  },
+  "syncPlaylistTooltip": "Sincronizar lista",
+  "@syncPlaylistTooltip": {
+    "description": "Tooltip for sync playlist action button in playlist detail"
+  },
+  "syncingPlaylist": "Sincronizando lista...",
+  "@syncingPlaylist": {
+    "description": "Loading message when playlist synchronization is in progress"
+  },
+  "syncResultAddedAndRemoved": "+{added} {added, plural, =1{añadida} other{añadidas}}, -{removed} {removed, plural, =1{removida} other{removidas}}",
+  "@syncResultAddedAndRemoved": {
+    "description": "Message showing songs added and removed after syncing",
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultAdded": "+{added} {added, plural, =1{añadida} other{añadidas}}",
+  "@syncResultAdded": {
+    "description": "Message showing songs added after syncing",
+    "placeholders": {
+      "added": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultRemoved": "-{removed} {removed, plural, =1{removida} other{removidas}}",
+  "@syncResultRemoved": {
+    "description": "Message showing songs removed after syncing",
+    "placeholders": {
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultNoChanges": "La lista ya está actualizada",
+  "@syncResultNoChanges": {
+    "description": "Message when sync completes with no changes"
+  },
+  "errorSyncingPlaylist": "No se pudo sincronizar la lista. Verifica el enlace y tu conexión.",
+  "@errorSyncingPlaylist": {
+    "description": "Error message when playlist synchronization fails"
+  },
+  "errorSingleVideoNotPlaylist": "Este enlace es de una canción individual, no de una lista de reproducción. Puedes importarla desde la pestaña Biblioteca.",
+  "@errorSingleVideoNotPlaylist": {
+    "description": "Error message when user enters a single video link instead of a playlist link"
   }
 }
+

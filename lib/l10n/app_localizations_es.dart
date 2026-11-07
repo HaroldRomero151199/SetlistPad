@@ -270,4 +270,60 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get hideDialog => 'Continuar en segundo plano';
+
+  @override
+  String get syncPlaylistTooltip => 'Sincronizar lista';
+
+  @override
+  String get syncingPlaylist => 'Sincronizando lista...';
+
+  @override
+  String syncResultAddedAndRemoved(int added, int removed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: 'añadidas',
+      one: 'añadida',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      removed,
+      locale: localeName,
+      other: 'removidas',
+      one: 'removida',
+    );
+    return '+$added $_temp0, -$removed $_temp1';
+  }
+
+  @override
+  String syncResultAdded(int added) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: 'añadidas',
+      one: 'añadida',
+    );
+    return '+$added $_temp0';
+  }
+
+  @override
+  String syncResultRemoved(int removed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      removed,
+      locale: localeName,
+      other: 'removidas',
+      one: 'removida',
+    );
+    return '-$removed $_temp0';
+  }
+
+  @override
+  String get syncResultNoChanges => 'La lista ya está actualizada';
+
+  @override
+  String get errorSyncingPlaylist =>
+      'No se pudo sincronizar la lista. Verifica el enlace y tu conexión.';
+
+  @override
+  String get errorSingleVideoNotPlaylist =>
+      'Este enlace es de una canción individual, no de una lista de reproducción. Puedes importarla desde la pestaña Biblioteca.';
 }

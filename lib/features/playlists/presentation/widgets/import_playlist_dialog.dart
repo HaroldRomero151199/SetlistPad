@@ -83,13 +83,25 @@ class _ImportPlaylistDialogState extends ConsumerState<ImportPlaylistDialog> {
     final url = _urlController.text.trim();
     if (url.isEmpty) return;
 
+    final youtubeService = ref.read(youtubeServiceProvider);
+    final playlistId = youtubeService.extractPlaylistId(url);
+    final videoId = youtubeService.extractVideoId(url);
+
+    // If it's a single video URL with no playlist ID, warn the user clearly
+    if (playlistId == null && videoId != null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = context.l10n.errorSingleVideoNotPlaylist;
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final youtubeService = ref.read(youtubeServiceProvider);
       final metadata = await youtubeService.fetchPlaylistMetadata(url);
 
       if (!mounted) return;

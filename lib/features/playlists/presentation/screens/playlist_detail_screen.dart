@@ -9,6 +9,44 @@ class PlaylistDetailScreen extends ConsumerWidget {
 
   const PlaylistDetailScreen({super.key, required this.playlist});
 
+  Future<void> _syncPlaylist(
+    BuildContext context,
+    WidgetRef ref,
+    Playlist currentPlaylist,
+  ) async {
+    final syncingNotifier = ref.read(playlistSyncingProvider.notifier);
+    if (ref.read(playlistSyncingProvider).contains(currentPlaylist.id)) return;
+
+    syncingNotifier.setSyncing(currentPlaylist.id, true);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final colorScheme = context.colorScheme;
+
+    try {
+      final result = await ref
+          .read(playlistsNotifierProvider.notifier)
+          .syncPlaylist(currentPlaylist.id);
+
+      final message = PlaylistSyncHelper.formatMessage(l10n, result);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error syncing playlist: $e');
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorSyncingPlaylist),
+          backgroundColor: colorScheme.error,
+        ),
+      );
+    } finally {
+      syncingNotifier.setSyncing(currentPlaylist.id, false);
+    }
+  }
+
   void _showAddSongModal(BuildContext context, WidgetRef ref) {
     final songsAsync = ref.read(songsNotifierProvider);
 
@@ -24,19 +62,24 @@ class PlaylistDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 modalContext.l10n.addSongToPlaylist,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Expanded(
                 child: songsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text(modalContext.l10n.errorPrefix(e.toString()))),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(
+                      child: Text(modalContext.l10n.errorPrefix(e.toString()))),
                   data: (allSongs) {
                     final currentPlaylistSongs = ref
-                        .watch(playlistsNotifierProvider)
-                        .value
-                        ?.firstWhere((p) => p.id == playlist.id, orElse: () => playlist)
-                        .songIds ?? [];
+                            .watch(playlistsNotifierProvider)
+                            .value
+                            ?.firstWhere((p) => p.id == playlist.id,
+                                orElse: () => playlist)
+                            .songIds ??
+                        [];
 
                     final availableSongs = allSongs
                         .where((s) => !currentPlaylistSongs.contains(s.id))
@@ -47,7 +90,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
                         child: Text(
                           modalContext.l10n.noMoreSongsToAdd,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: modalContext.colorScheme.onSurfaceVariant),
+                          style: TextStyle(
+                              color: modalContext.colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -60,7 +104,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
                           leading: const Icon(Icons.music_note),
                           title: Text(song.title),
                           subtitle: Text(song.artist),
-                          trailing: Icon(Icons.add_circle_outline, color: modalContext.colorScheme.primary),
+                          trailing: Icon(Icons.add_circle_outline,
+                              color: modalContext.colorScheme.primary),
                           onTap: () {
                             ref
                                 .read(playlistsNotifierProvider.notifier)
@@ -85,34 +130,68 @@ class PlaylistDetailScreen extends ConsumerWidget {
     final playlistsAsync = ref.watch(playlistsNotifierProvider);
     final songsAsync = ref.watch(songsNotifierProvider);
 
-    final currentPlaylist = playlistsAsync.whenData((playlists) => playlists.firstWhere(
-          (p) => p.id == playlist.id,
-          orElse: () => playlist,
-        )).value ?? playlist;
+    final currentPlaylist = playlistsAsync
+            .whenData((playlists) => playlists.firstWhere(
+                  (p) => p.id == playlist.id,
+                  orElse: () => playlist,
+                ))
+            .value ??
+        playlist;
 
     final allSongsMap = songsAsync.value?.fold<Map<String, Song>>(
           {},
           (map, s) => map..[s.id] = s,
-        ) ?? {};
+        ) ??
+        {};
 
     final playlistSongs = currentPlaylist.songIds
         .map((id) => allSongsMap[id])
         .whereType<Song>()
         .toList();
 
+    final hasYoutubeUrl = currentPlaylist.youtubePlaylistUrl != null &&
+        currentPlaylist.youtubePlaylistUrl!.trim().isNotEmpty;
+    final isSyncing =
+        ref.watch(playlistSyncingProvider).contains(currentPlaylist.id);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(currentPlaylist.name),
         actions: [
+          if (hasYoutubeUrl)
+            isSyncing
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.sync),
+                    tooltip: context.l10n.syncPlaylistTooltip,
+                    onPressed: () =>
+                        _syncPlaylist(context, ref, currentPlaylist),
+                  ),
           IconButton(
-            icon: Icon(Icons.delete_outline, color: context.colorScheme.error),
+            icon: Icon(
+              Icons.delete_outline,
+              color: isSyncing
+                  ? context.colorScheme.onSurface.withValues(alpha: 0.38)
+                  : context.colorScheme.error,
+            ),
             tooltip: context.l10n.deletePlaylistTooltip,
-            onPressed: () {
-              ref
-                  .read(playlistsNotifierProvider.notifier)
-                  .deletePlaylist(currentPlaylist.id);
-              Navigator.of(context).pop();
-            },
+            onPressed: isSyncing
+                ? null
+                : () {
+                    ref
+                        .read(playlistsNotifierProvider.notifier)
+                        .deletePlaylist(currentPlaylist.id);
+                    Navigator.of(context).pop();
+                  },
           ),
         ],
       ),
@@ -124,7 +203,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 currentPlaylist.description,
-                style: TextStyle(color: context.colorScheme.onSurfaceVariant, fontSize: 14),
+                style: TextStyle(
+                    color: context.colorScheme.onSurfaceVariant, fontSize: 14),
               ),
             ),
           ],
@@ -152,7 +232,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
                     child: Text(
                       context.l10n.noSongsInPlaylist,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: context.colorScheme.onSurfaceVariant),
+                      style:
+                          TextStyle(color: context.colorScheme.onSurfaceVariant),
                     ),
                   )
                 : ListView.builder(
@@ -168,11 +249,13 @@ class PlaylistDetailScreen extends ConsumerWidget {
                         title: Text(song.title),
                         subtitle: Text(song.artist),
                         trailing: IconButton(
-                          icon: Icon(Icons.remove_circle_outline, color: context.colorScheme.onSurfaceVariant),
+                          icon: Icon(Icons.remove_circle_outline,
+                              color: context.colorScheme.onSurfaceVariant),
                           onPressed: () {
                             ref
                                 .read(playlistsNotifierProvider.notifier)
-                                .removeSongFromPlaylist(currentPlaylist.id, song.id);
+                                .removeSongFromPlaylist(
+                                    currentPlaylist.id, song.id);
                           },
                         ),
                         onTap: () {

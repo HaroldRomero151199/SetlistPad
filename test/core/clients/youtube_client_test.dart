@@ -128,25 +128,40 @@ void main() {
 
     test('fetchPlaylistData falls back to Atom XML feed when web page lacks ytInitialData', () async {
       const atomXml = '''<?xml version="1.0" encoding="UTF-8"?>
-      <feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/">
-        <title>Fallback Playlist Title</title>
-        <author><name>Harold</name></author>
-        <entry>
-          <yt:videoId>xmlVid12345</yt:videoId>
-          <media:title>Bon Jovi - Livin on a Prayer</media:title>
-          <author><name>Bon Jovi</name></author>
-          <media:group>
-            <media:thumbnail url="https://i.ytimg.com/vi/xmlVid12345/hqdefault.jpg"/>
-          </media:group>
-        </entry>
-      </feed>
-      ''';
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?playlist_id=PLFallback123"/>
+ <id>yt:playlist:PLFallback123</id>
+ <title>Acoustic Live Concerts</title>
+ <author>
+  <name>John Mayer</name>
+ </author>
+ <entry>
+  <id>yt:video:vidAtom001</id>
+  <yt:videoId>vidAtom001</yt:videoId>
+  <title>John Mayer - Gravity (Live in LA)</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=vidAtom001"/>
+  <author>
+   <name>John Mayer</name>
+  </author>
+  <media:thumbnail url="https://i.ytimg.com/vi/vidAtom001/hqdefault.jpg"/>
+ </entry>
+ <entry>
+  <id>yt:video:vidAtom002</id>
+  <yt:videoId>vidAtom002</yt:videoId>
+  <title>Slow Dancing in a Burning Room</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=vidAtom002"/>
+  <author>
+   <name>John Mayer</name>
+  </author>
+ </entry>
+</feed>
+''';
 
       final mockClient = MockClient((request) async {
         if (request.url.path == '/playlist') {
-          return http.Response('<html><body>Blocked / Bot Check</body></html>', 200);
+          return http.Response('<html>No ytInitialData here</html>', 200);
         }
-        if (request.url.path.contains('videos.xml')) {
+        if (request.url.path == '/feeds/videos.xml') {
           return http.Response(atomXml, 200);
         }
         return http.Response('Not Found', 404);
@@ -158,31 +173,39 @@ void main() {
       );
 
       expect(response.playlistId, 'PLFallback123');
-      expect(response.title, 'Fallback Playlist Title');
-      expect(response.author, 'Harold');
-      expect(response.tracks.length, 1);
-      expect(response.tracks[0].videoId, 'xmlVid12345');
-      expect(response.tracks[0].title, 'Bon Jovi - Livin on a Prayer');
-      expect(response.tracks[0].author, 'Bon Jovi');
+      expect(response.title, 'Acoustic Live Concerts');
+      expect(response.author, 'John Mayer');
+      expect(response.tracks.length, 2);
+      expect(response.tracks[0].videoId, 'vidAtom001');
+      expect(response.tracks[0].title, 'John Mayer - Gravity (Live in LA)');
+      expect(response.tracks[0].author, 'John Mayer');
+      expect(response.tracks[0].thumbnailUrl, 'https://i.ytimg.com/vi/vidAtom001/hqdefault.jpg');
+      expect(response.tracks[0].videoUrl, 'https://www.youtube.com/watch?v=vidAtom001');
+      expect(response.tracks[1].videoId, 'vidAtom002');
+      expect(response.tracks[1].title, 'Slow Dancing in a Burning Room');
+      expect(response.tracks[1].author, 'John Mayer');
     });
 
     test('fetchPlaylistData throws FormatException if playlistId is empty', () async {
       final client = YouTubeClient();
       expect(
-        () => client.fetchPlaylistData(const YouTubePlaylistRequest(playlistId: '')),
+        () => client.fetchPlaylistData(const YouTubePlaylistRequest(playlistId: '   ')),
         throwsA(isA<FormatException>()),
       );
     });
 
     test('fetchPlaylistData throws Exception when both web page and Atom feed fail', () async {
-      final mockClient = MockClient((request) async => http.Response('Error', 500));
-      final client = YouTubeClient(client: mockClient);
+      final mockClient = MockClient((request) async {
+        return http.Response('Server Error', 500);
+      });
 
+      final client = YouTubeClient(client: mockClient);
       expect(
-        () => client.fetchPlaylistData(const YouTubePlaylistRequest(playlistId: 'PLNonexistent')),
+        () => client.fetchPlaylistData(const YouTubePlaylistRequest(playlistId: 'PLBroken')),
         throwsA(isA<Exception>()),
       );
     });
+
     test('fetchPlaylistData follows continuation pages to fetch all tracks', () async {
       final initialPageHtml = '''
       <!DOCTYPE html>
@@ -233,9 +256,7 @@ void main() {
               }
             }
           };
-        </script>
-        <script>
-          var ytcfg = {"INNERTUBE_API_KEY":"FakeKey123"};
+          window.ytcfg = {"INNERTUBE_API_KEY": "FakeKey123"};
         </script>
       </body>
       </html>
@@ -285,6 +306,37 @@ void main() {
       expect(response.tracks[0].title, 'Track 1');
       expect(response.tracks[1].videoId, 'vid_page_2');
       expect(response.tracks[1].title, 'Track 2');
+    });
+
+    test('fetchPlaylistData falls back to Atom XML feed when web page request fails', () async {
+      const atomXml = '''<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <title>Fallback Playlist</title>
+ <author><name>FallbackArtist</name></author>
+ <entry>
+  <yt:videoId>fallback_vid_1</yt:videoId>
+  <title>Fallback Track 1</title>
+  <author><name>FallbackArtist</name></author>
+ </entry>
+</feed>''';
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/feeds/videos.xml') {
+          return http.Response(atomXml, 200);
+        }
+        return http.Response('Internal Server Error', 500);
+      });
+
+      final client = YouTubeClient(client: mockClient);
+      final response = await client.fetchPlaylistData(
+        const YouTubePlaylistRequest(playlistId: 'PLFallback123'),
+      );
+
+      expect(response.title, 'Fallback Playlist');
+      expect(response.author, 'FallbackArtist');
+      expect(response.tracks.length, 1);
+      expect(response.tracks.first.videoId, 'fallback_vid_1');
+      expect(response.tracks.first.title, 'Fallback Track 1');
     });
   });
 }

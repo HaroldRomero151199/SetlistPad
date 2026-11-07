@@ -64,6 +64,10 @@ void main() {
         isTrue,
       );
       expect(
+        service.isPlaylistUrl('https://www.youtube.com/watch?v=abc12345678&list=PL4fGSI1pDJn6jWpXK5A8k68Wp9Z2yK_b3'),
+        isTrue,
+      );
+      expect(
         service.isPlaylistUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
         isFalse,
       );
@@ -114,6 +118,13 @@ void main() {
       expect(metadata.items[1].videoId, 'track222222');
       expect(metadata.items[1].title, 'Wonderwall');
       expect(metadata.items[1].artist, 'Oasis');
+    });
+
+    test('fetchPlaylistMetadata throws FormatException on single video URL', () async {
+      expect(
+        () => service.fetchPlaylistMetadata('https://youtu.be/9hvVF_xSKRs?si=rsyblxRrDxiRT2lX'),
+        throwsA(isA<FormatException>()),
+      );
     });
 
     test('fetchPlaylistMetadata throws FormatException on invalid URL', () async {

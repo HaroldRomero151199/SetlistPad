@@ -269,4 +269,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hideDialog => 'Run in background';
+
+  @override
+  String get syncPlaylistTooltip => 'Sync playlist';
+
+  @override
+  String get syncingPlaylist => 'Syncing playlist...';
+
+  @override
+  String syncResultAddedAndRemoved(int added, int removed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: 'added',
+      one: 'added',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      removed,
+      locale: localeName,
+      other: 'removed',
+      one: 'removed',
+    );
+    return '+$added $_temp0, -$removed $_temp1';
+  }
+
+  @override
+  String syncResultAdded(int added) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: 'added',
+      one: 'added',
+    );
+    return '+$added $_temp0';
+  }
+
+  @override
+  String syncResultRemoved(int removed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      removed,
+      locale: localeName,
+      other: 'removed',
+      one: 'removed',
+    );
+    return '-$removed $_temp0';
+  }
+
+  @override
+  String get syncResultNoChanges => 'Playlist is already up to date';
+
+  @override
+  String get errorSyncingPlaylist =>
+      'Failed to sync playlist. Please check the URL and your connection.';
+
+  @override
+  String get errorSingleVideoNotPlaylist =>
+      'This link is for a single song, not a playlist. You can import it from the Library tab.';
 }

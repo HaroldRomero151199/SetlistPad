@@ -45,8 +45,7 @@ class YouTubeService {
       return true;
     }
     final playlistId = extractPlaylistId(trimmed);
-    final videoId = extractVideoId(trimmed);
-    return playlistId != null && videoId == null;
+    return playlistId != null && playlistId.isNotEmpty;
   }
 
   /// Fetches metadata and parsed tracks for a YouTube playlist
@@ -79,6 +78,7 @@ class YouTubeService {
       title: response.title,
       author: response.author,
       items: items,
+      isComplete: response.isComplete,
     );
   }
 
