@@ -505,6 +505,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Run in background'**
   String get hideDialog;
+
+  /// Tooltip for sync playlist action button in playlist detail
+  ///
+  /// In en, this message translates to:
+  /// **'Sync playlist'**
+  String get syncPlaylistTooltip;
+
+  /// Loading message when playlist synchronization is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing playlist...'**
+  String get syncingPlaylist;
+
+  /// Message showing songs added and removed after syncing
+  ///
+  /// In en, this message translates to:
+  /// **'+{added} {added, plural, =1{added} other{added}}, -{removed} {removed, plural, =1{removed} other{removed}}'**
+  String syncResultAddedAndRemoved(int added, int removed);
+
+  /// Message showing songs added after syncing
+  ///
+  /// In en, this message translates to:
+  /// **'+{added} {added, plural, =1{added} other{added}}'**
+  String syncResultAdded(int added);
+
+  /// Message showing songs removed after syncing
+  ///
+  /// In en, this message translates to:
+  /// **'-{removed} {removed, plural, =1{removed} other{removed}}'**
+  String syncResultRemoved(int removed);
+
+  /// Message when sync completes with no changes
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist is already up to date'**
+  String get syncResultNoChanges;
+
+  /// Error message when playlist synchronization fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to sync playlist. Please check the URL and your connection.'**
+  String get errorSyncingPlaylist;
+
+  /// Error message when user enters a single video link instead of a playlist link
+  ///
+  /// In en, this message translates to:
+  /// **'This link is for a single song, not a playlist. You can import it from the Library tab.'**
+  String get errorSingleVideoNotPlaylist;
 }
 
 class _AppLocalizationsDelegate

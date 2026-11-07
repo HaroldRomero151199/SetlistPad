@@ -92,6 +92,7 @@ void main() {
 
       expect(find.text('Select All'), findsOneWidget);
     });
+
     testWidgets('duplicate tracks can be selected and deselected independently by index', (tester) async {
       final sampleMetadata = YouTubePlaylistMetadata(
         id: 'PLDupTest',
@@ -132,6 +133,32 @@ void main() {
 
       // Only one item remains selected, proving independence
       expect(find.text('1 Song'), findsOneWidget);
+    });
+
+    testWidgets('shows warning message when user enters a single video URL instead of a playlist', (tester) async {
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          const ImportPlaylistDialog(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Enter single video URL
+      await tester.enterText(
+        find.byType(TextFormField),
+        'https://youtu.be/9hvVF_xSKRs?si=rsyblxRrDxiRT2lX',
+      );
+      await tester.pumpAndSettle();
+
+      // Tap import button
+      await tester.tap(find.text('Import'));
+      await tester.pumpAndSettle();
+
+      // Expect specific single video warning
+      expect(
+        find.text('This link is for a single song, not a playlist. You can import it from the Library tab.'),
+        findsOneWidget,
+      );
     });
   });
 }

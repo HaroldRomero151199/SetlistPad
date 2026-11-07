@@ -4,10 +4,59 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../songs/songs.dart';
 import '../../playlists.dart';
 
-class PlaylistDetailScreen extends ConsumerWidget {
+class PlaylistDetailScreen extends ConsumerStatefulWidget {
   final Playlist playlist;
 
   const PlaylistDetailScreen({super.key, required this.playlist});
+
+  @override
+  ConsumerState<PlaylistDetailScreen> createState() => _PlaylistDetailScreenState();
+}
+
+class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
+  bool _isSyncing = false;
+
+  Future<void> _syncPlaylist(Playlist currentPlaylist) async {
+    if (_isSyncing) return;
+    setState(() {
+      _isSyncing = true;
+    });
+
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final colorScheme = context.colorScheme;
+
+    try {
+      final result = await ref
+          .read(playlistsNotifierProvider.notifier)
+          .syncPlaylist(currentPlaylist.id);
+
+      if (!mounted) return;
+
+      final message = PlaylistSyncHelper.formatMessage(l10n, result);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error syncing playlist: $e');
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorSyncingPlaylist),
+          backgroundColor: colorScheme.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSyncing = false;
+        });
+      }
+    }
+  }
 
   void _showAddSongModal(BuildContext context, WidgetRef ref) {
     final songsAsync = ref.read(songsNotifierProvider);
@@ -35,7 +84,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
                     final currentPlaylistSongs = ref
                         .watch(playlistsNotifierProvider)
                         .value
-                        ?.firstWhere((p) => p.id == playlist.id, orElse: () => playlist)
+                        ?.firstWhere((p) => p.id == widget.playlist.id, orElse: () => widget.playlist)
                         .songIds ?? [];
 
                     final availableSongs = allSongs
@@ -64,7 +113,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
                           onTap: () {
                             ref
                                 .read(playlistsNotifierProvider.notifier)
-                                .addSongToPlaylist(playlist.id, song.id);
+                                .addSongToPlaylist(widget.playlist.id, song.id);
                             Navigator.of(modalContext).pop();
                           },
                         );
@@ -81,14 +130,14 @@ class PlaylistDetailScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final playlistsAsync = ref.watch(playlistsNotifierProvider);
     final songsAsync = ref.watch(songsNotifierProvider);
 
     final currentPlaylist = playlistsAsync.whenData((playlists) => playlists.firstWhere(
-          (p) => p.id == playlist.id,
-          orElse: () => playlist,
-        )).value ?? playlist;
+          (p) => p.id == widget.playlist.id,
+          orElse: () => widget.playlist,
+        )).value ?? widget.playlist;
 
     final allSongsMap = songsAsync.value?.fold<Map<String, Song>>(
           {},
@@ -100,10 +149,30 @@ class PlaylistDetailScreen extends ConsumerWidget {
         .whereType<Song>()
         .toList();
 
+    final hasYoutubeUrl = currentPlaylist.youtubePlaylistUrl != null &&
+        currentPlaylist.youtubePlaylistUrl!.trim().isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(currentPlaylist.name),
         actions: [
+          if (hasYoutubeUrl)
+            _isSyncing
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.sync),
+                    tooltip: context.l10n.syncPlaylistTooltip,
+                    onPressed: () => _syncPlaylist(currentPlaylist),
+                  ),
           IconButton(
             icon: Icon(Icons.delete_outline, color: context.colorScheme.error),
             tooltip: context.l10n.deletePlaylistTooltip,

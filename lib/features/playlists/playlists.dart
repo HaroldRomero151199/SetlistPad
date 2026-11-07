@@ -1,9 +1,13 @@
 export 'domain/models/playlist_model.dart';
+export 'domain/models/playlist_sync_result.dart';
+export 'domain/services/playlist_sync_service.dart';
+export 'domain/services/playlist_sync_validator.dart';
 export 'data/repositories/playlist_repository.dart';
 export 'presentation/providers/playlists_notifier.dart';
 export 'presentation/screens/playlists_screen.dart';
 export 'presentation/screens/playlist_detail_screen.dart';
 export 'presentation/utils/playlist_name_helper.dart';
+export 'presentation/utils/playlist_sync_helper.dart';
 export 'presentation/views/import_playlist_preview_view.dart';
 export 'presentation/views/import_playlist_progress_view.dart';
 export 'presentation/views/import_playlist_url_view.dart';
