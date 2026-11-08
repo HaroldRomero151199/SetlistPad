@@ -1,4 +1,6 @@
+export 'lyrics_export_service.dart';
 export 'lyrics_service.dart';
+export 'translation_service.dart';
 export 'youtube_service.dart';
 export 'models/youtube_metadata.dart';
 export 'models/youtube_playlist_item.dart';

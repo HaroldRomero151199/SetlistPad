@@ -123,6 +123,47 @@
   "errorSingleVideoNotPlaylist": "Este enlace es de una canción individual, no de una lista de reproducción. Puedes importarla desde la pestaña Biblioteca.",
   "@errorSingleVideoNotPlaylist": {
     "description": "Error message when user enters a single video link instead of a playlist link"
+  },
+  "bilingualLyrics": "Letras Bilingües",
+  "@bilingualLyrics": {
+    "description": "Tooltip and label for toggling bilingual lyrics view"
+  },
+  "originalLyrics": "Letras Originales",
+  "@originalLyrics": {
+    "description": "Tooltip and label for toggling back to original lyrics view"
+  },
+  "targetLanguage": "Idioma de Destino",
+  "@targetLanguage": {
+    "description": "Label for the target language selector"
+  },
+  "translateLyrics": "Traducir",
+  "@translateLyrics": {
+    "description": "Action label to trigger translation"
+  },
+  "translatingLyrics": "Traduciendo letra...",
+  "@translatingLyrics": {
+    "description": "Status text while translating lyrics"
+  },
+  "translationError": "No se pudo completar la traducción. Mostrando texto original.",
+  "@translationError": {
+    "description": "Error notification when translation encounters issues"
+  },
+  "exportBilingualTxt": "Exportar (.txt)",
+  "@exportBilingualTxt": {
+    "description": "Tooltip and label for exporting bilingual lyrics to text file"
+  },
+  "exportSuccess": "Exportado en {path}",
+  "@exportSuccess": {
+    "description": "Notification when export succeeds",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "exportFailed": "Error al exportar el archivo",
+  "@exportFailed": {
+    "description": "Notification when export fails"
   }
 }
 

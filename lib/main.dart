@@ -18,6 +18,7 @@ void main() async {
 
   await Hive.openBox<Song>(HiveBoxes.songs);
   await Hive.openBox<Playlist>(HiveBoxes.playlists);
+  await Hive.openBox<String>(HiveBoxes.translationsCache);
 
   runApp(const ProviderScope(child: SetlistPadApp()));
 }

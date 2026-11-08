@@ -23,6 +23,14 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
   void initState() {
     super.initState();
     _lyricsController = TextEditingController(text: widget.song.lyrics);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final currentBilingual = ref.read(bilingualLyricsNotifierProvider);
+        if (currentBilingual.songId != widget.song.id) {
+          ref.read(bilingualLyricsNotifierProvider.notifier).reset();
+        }
+      }
+    });
   }
 
   @override
@@ -98,6 +106,10 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
     final currentSong = songsAsync.whenData((songs) =>
             songs.firstWhere((s) => s.id == widget.song.id, orElse: () => widget.song)).value ??
         widget.song;
+    final bilingualState = ref.watch(bilingualLyricsNotifierProvider);
+    final isBilingualForCurrentSong =
+        bilingualState.songId == currentSong.id &&
+            bilingualState.isBilingualMode;
 
     return Scaffold(
       appBar: AppBar(
@@ -112,6 +124,57 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
           ],
         ),
         actions: [
+          if (!_isEditing && currentSong.lyrics.isNotEmpty) ...[
+            IconButton(
+              icon: Icon(
+                isBilingualForCurrentSong
+                    ? Icons.translate
+                    : Icons.translate_outlined,
+              ),
+              tooltip: isBilingualForCurrentSong
+                  ? context.l10n.originalLyrics
+                  : context.l10n.bilingualLyrics,
+              onPressed: () {
+                ref
+                    .read(bilingualLyricsNotifierProvider.notifier)
+                    .toggleBilingualMode(currentSong);
+              },
+            ),
+            if (isBilingualForCurrentSong)
+              IconButton(
+                icon: bilingualState.isExporting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.file_download_outlined),
+                tooltip: context.l10n.exportBilingualTxt,
+                onPressed: bilingualState.isExporting
+                    ? null
+                    : () async {
+                        final file = await ref
+                            .read(bilingualLyricsNotifierProvider.notifier)
+                            .exportToTextFile(currentSong);
+                        if (!context.mounted) return;
+                        if (file != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                context.l10n.exportSuccess(file.path),
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(context.l10n.exportFailed),
+                            ),
+                          );
+                        }
+                      },
+              ),
+          ],
           if (!_isEditing)
             IconButton(
               icon: _isSearchingLyrics
@@ -149,6 +212,34 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
               });
             },
           ),
+          if (!_isEditing &&
+              currentSong.lyrics.isNotEmpty &&
+              isBilingualForCurrentSong)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    context.l10n.targetLanguage,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: context.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  BilingualLanguageSelector(
+                    selectedLanguage: bilingualState.targetLanguage,
+                    onLanguageSelected: (newLang) {
+                      ref
+                          .read(bilingualLyricsNotifierProvider.notifier)
+                          .setTargetLanguage(currentSong, newLang);
+                    },
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -162,10 +253,20 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
                           isSearchingLyrics: _isSearchingLyrics,
                           onSearchOnline: _searchLyricsOnline,
                         )
-                      : SongLyricsViewer(
-                          lyrics: currentSong.lyrics,
-                          fontSize: _fontSize,
-                        ),
+                      : isBilingualForCurrentSong
+                          ? SongBilingualLyricsView(
+                              lines: bilingualState.lines,
+                              fontSize: _fontSize,
+                              isLoading: bilingualState.isLoading,
+                              errorMessage: bilingualState.errorMessage,
+                              onRetry: () => ref
+                                  .read(bilingualLyricsNotifierProvider.notifier)
+                                  .translate(currentSong, forceRefresh: true),
+                            )
+                          : SongLyricsViewer(
+                              lyrics: currentSong.lyrics,
+                              fontSize: _fontSize,
+                            ),
             ),
           ),
         ],

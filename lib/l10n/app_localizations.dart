@@ -553,6 +553,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This link is for a single song, not a playlist. You can import it from the Library tab.'**
   String get errorSingleVideoNotPlaylist;
+
+  /// Tooltip and label for toggling bilingual lyrics view
+  ///
+  /// In en, this message translates to:
+  /// **'Bilingual Lyrics'**
+  String get bilingualLyrics;
+
+  /// Tooltip and label for toggling back to original lyrics view
+  ///
+  /// In en, this message translates to:
+  /// **'Original Lyrics'**
+  String get originalLyrics;
+
+  /// Label for the target language selector
+  ///
+  /// In en, this message translates to:
+  /// **'Target Language'**
+  String get targetLanguage;
+
+  /// Action label to trigger translation
+  ///
+  /// In en, this message translates to:
+  /// **'Translate'**
+  String get translateLyrics;
+
+  /// Status text while translating lyrics
+  ///
+  /// In en, this message translates to:
+  /// **'Translating lyrics...'**
+  String get translatingLyrics;
+
+  /// Error notification when translation encounters issues
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete translation. Showing original text.'**
+  String get translationError;
+
+  /// Tooltip and label for exporting bilingual lyrics to text file
+  ///
+  /// In en, this message translates to:
+  /// **'Export (.txt)'**
+  String get exportBilingualTxt;
+
+  /// Notification when export succeeds
+  ///
+  /// In en, this message translates to:
+  /// **'Exported to {path}'**
+  String exportSuccess(String path);
+
+  /// Notification when export fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export file'**
+  String get exportFailed;
 }
 
 class _AppLocalizationsDelegate

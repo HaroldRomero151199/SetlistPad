@@ -18,4 +18,7 @@ abstract final class ApiConfig {
       'https://www.youtube.com/feeds/videos.xml';
   static const String youtubeiBrowseUrl =
       'https://www.youtube.com/youtubei/v1/browse';
+
+  // Translation API Configuration (open translation provider)
+  static const String translationBaseUrl = 'https://api.mymemory.translated.net/get';
 }

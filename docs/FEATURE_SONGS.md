@@ -1,6 +1,6 @@
 # Feature: Songs (`lib/features/songs`)
 
-The **Songs** feature manages the local song catalog, monospace chord/lyrics viewer, inline lyrics editor, and online lyrics retrieval integration.
+The **Songs** feature manages the local song catalog, monospace chord/lyrics viewer, inline lyrics editor, online lyrics retrieval integration, and interlinear bilingual translation.
 
 ---
 
@@ -14,20 +14,28 @@ lib/features/songs/
 ├── domain/
 │   └── models/
 │       ├── song_model.dart                 # Immutable Song entity with Hive TypeAdapter (typeId: 0)
-│       └── song_model.g.dart               # Generated Hive serializer
+│       ├── song_model.g.dart               # Generated Hive serializer
+│       └── bilingual_line.dart             # Model representing an aligned pair of original and translated verse
 ├── presentation/
 │   ├── providers/
-│   │   └── songs_notifier.dart             # SongsNotifier managing batch imports, real-time search, and lyrics updates
+│   │   ├── songs_notifier.dart             # SongsNotifier managing batch imports, real-time search, and lyrics updates
+│   │   ├── bilingual_lyrics_state.dart     # State definition for bilingual translation mode and export
+│   │   └── bilingual_lyrics_notifier.dart  # Manages bilingual mode, language selection, translation, and export
 │   ├── screens/
 │   │   ├── songs_screen.dart               # Main song catalog screen with search bar and song tiles
-│   │   └── song_detail_screen.dart         # Song detail screen orchestrating view, edit, and search modes
+│   │   └── song_detail_screen.dart         # Song detail screen orchestrating view, edit, search, and bilingual modes
 │   ├── views/                              # Composed state/sub-screen views
 │   │   ├── song_empty_lyrics_view.dart     # Empty state prompt with one-tap online lyrics search
 │   │   ├── song_lyrics_view.dart           # Performance reading view with monospace chords and lyrics
-│   │   └── song_lyrics_edit_view.dart      # Full-featured multiline lyrics and chord editor view
-│   └── widgets/                            # Atomic components and dialogs
-│       ├── import_song_dialog.dart         # Dialog for importing single songs via YouTube URLs
-│       └── song_font_size_toolbar.dart     # Floating/header toolbar controlling chord sheet font scale
+│   │   ├── song_lyrics_edit_view.dart      # Full-featured multiline lyrics and chord editor view
+│   │   └── song_bilingual_lyrics_view.dart # Interlinear bilingual lyrics view (original line with translation directly below)
+│   ├── widgets/                            # Atomic components and dialogs
+│   │   ├── import_song_dialog.dart         # Dialog for importing single songs via YouTube URLs
+│   │   ├── song_font_size_toolbar.dart     # Floating/header toolbar controlling chord sheet font scale
+│   │   ├── bilingual_line_tile.dart        # Atomic tile displaying a single original verse and its translation below
+│   │   └── bilingual_language_selector.dart# Popup selector for target languages (ES, EN, PT, FR, IT, DE)
+│   └── utils/
+│       └── bilingual_lyrics_parser.dart    # Pure utility for splitting, line alignment, and alternating .txt export formatting
 └── songs.dart                              # Public barrel export for the songs feature
 ```
 
@@ -42,3 +50,9 @@ lib/features/songs/
      - Empty lyrics: renders `SongEmptyLyricsView` with automated search.
      - Edit mode: renders `SongLyricsEditView`.
      - Read/Performance mode: renders `SongLyricsView` coupled with `SongFontSizeToolbar`.
+     - Bilingual translation mode: renders `SongBilingualLyricsView` displaying the original line on top and the translated verse directly below, integrated with `BilingualLanguageSelector` and `SongFontSizeToolbar`.
+3. **Interlinear Translation & Caching**:
+   - `TranslationService` queries external translation endpoints (MyMemory API) with fallback, and caches results in Hive (`translations_cache_box`) keyed by song and language to avoid redundant requests.
+   - `BilingualLyricsParser` preserves stanza breaks, line breaks, and alignment without desynchronizing verse order.
+4. **Bilingual Text Export**:
+   - `LyricsExportService` generates clean alternating `.txt` files in local storage with sanitized filenames for easy reading and sharing.
