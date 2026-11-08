@@ -1,47 +1,8 @@
-import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:setlist_pad/core/services/services.dart';
 import 'package:setlist_pad/features/songs/songs.dart';
-
-class FakeTranslationService extends TranslationService {
-  int callCount = 0;
-  String? lastLanguage;
-
-  @override
-  Future<List<BilingualLine>> translateLyrics({
-    required String lyrics,
-    required String targetLanguage,
-    String? songId,
-    String sourceLanguage = 'autodetect',
-  }) async {
-    callCount++;
-    lastLanguage = targetLanguage;
-    return [
-      BilingualLine(
-        lineNumber: 1,
-        original: 'Original Line',
-        translation: 'Línea Traducida ($targetLanguage)',
-      ),
-    ];
-  }
-}
-
-class FakeLyricsExportService extends LyricsExportService {
-  @override
-  Future<File> exportBilingualLyrics({
-    required String title,
-    required String artist,
-    required List<BilingualLine> lines,
-    required String targetLanguage,
-    Directory? destinationDirectory,
-  }) async {
-    final tempDir = Directory.systemTemp;
-    final file = File('${tempDir.path}/fake_export.txt');
-    await file.writeAsString('fake content');
-    return file;
-  }
-}
+import '../../../../fakes/fake_lyrics_export_service.dart';
+import '../../../../fakes/fake_translation_service.dart';
 
 void main() {
   group('BilingualLyricsNotifier Tests', () {
@@ -191,4 +152,3 @@ void main() {
     });
   });
 }
-

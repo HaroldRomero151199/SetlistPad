@@ -7,7 +7,7 @@ class TranslationRequest {
   const TranslationRequest({
     required this.text,
     required this.targetLanguage,
-    this.sourceLanguage = 'autodetect',
+    required this.sourceLanguage,
   });
 
   Map<String, String> toQueryParams() {
@@ -17,4 +17,3 @@ class TranslationRequest {
     };
   }
 }
-

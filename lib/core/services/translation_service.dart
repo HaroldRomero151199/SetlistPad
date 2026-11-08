@@ -2,31 +2,37 @@ import 'package:hive/hive.dart';
 import '../clients/translation/translation_client.dart';
 import '../../features/songs/domain/models/bilingual_line.dart';
 import '../../features/songs/presentation/utils/bilingual_lyrics_parser.dart';
+import 'utils/language_detector.dart';
 
 /// Domain service managing lyrics translation, interlinear alignment, and Hive caching
 class TranslationService {
   final TranslationClient _client;
   final Box<String>? _cacheBox;
   final BilingualLyricsParser _parser;
+  final LanguageDetector _languageDetector;
 
   TranslationService({
     TranslationClient? client,
     Box<String>? cacheBox,
     BilingualLyricsParser? parser,
+    LanguageDetector? languageDetector,
   })  : _client = client ?? TranslationClient(),
         _cacheBox = cacheBox,
-        _parser = parser ?? const BilingualLyricsParser();
+        _parser = parser ?? const BilingualLyricsParser(),
+        _languageDetector = languageDetector ?? const LanguageDetector();
 
-  /// Computes a unique cache key based on song ID (or lyrics hash) and target language
+  /// Computes a unique cache key including song ID (if present), lyrics fingerprint hash, and target language
   String computeCacheKey({
     String? songId,
     required String lyrics,
     required String targetLanguage,
   }) {
+    final lyricsHash = lyrics.trim().hashCode.abs();
+    final cleanLang = targetLanguage.toLowerCase().trim();
     if (songId != null && songId.isNotEmpty) {
-      return '${songId}_${targetLanguage.toLowerCase()}';
+      return '${songId}_${lyricsHash}_$cleanLang';
     }
-    return '${lyrics.hashCode}_${targetLanguage.toLowerCase()}';
+    return 'hash_${lyricsHash}_$cleanLang';
   }
 
   /// Translates full lyrics preserving structure, empty lines, and verse order.
@@ -35,7 +41,7 @@ class TranslationService {
     required String lyrics,
     required String targetLanguage,
     String? songId,
-    String sourceLanguage = 'autodetect',
+    String? sourceLanguage,
   }) async {
     if (lyrics.trim().isEmpty) return const [];
 
@@ -53,6 +59,16 @@ class TranslationService {
       }
     }
 
+    // Heuristically detect valid ISO source language if not explicitly provided
+    final resolvedSource = (sourceLanguage != null &&
+            sourceLanguage.trim().isNotEmpty &&
+            sourceLanguage != 'autodetect')
+        ? sourceLanguage.toLowerCase().trim()
+        : _languageDetector.detectLanguage(
+            lyrics,
+            targetLanguage: targetLanguage,
+          );
+
     final rawLines = _parser.splitLines(lyrics);
     final uniqueLines =
         rawLines.where((l) => l.trim().isNotEmpty).toSet().toList();
@@ -64,7 +80,7 @@ class TranslationService {
         final translated = await _client.translateText(
           text: line.trim(),
           targetLanguage: targetLanguage,
-          sourceLanguage: sourceLanguage,
+          sourceLanguage: resolvedSource,
         );
         if (translated != null && translated.isNotEmpty) {
           translationMap[line] = translated;
@@ -80,8 +96,11 @@ class TranslationService {
       return translationMap[line] ?? '';
     }).join('\n');
 
-    // 4. Cache translation in Hive if at least one translated line was resolved
-    if (translationMap.isNotEmpty && _cacheBox != null && _cacheBox.isOpen) {
+    // 4. Cache translation in Hive ONLY if all unique lines were successfully translated
+    // This prevents permanently caching partial or broken translations
+    final isComplete =
+        uniqueLines.isNotEmpty && translationMap.length == uniqueLines.length;
+    if (isComplete && _cacheBox != null && _cacheBox.isOpen) {
       await _cacheBox.put(cacheKey, translatedLyrics);
     }
 
@@ -107,4 +126,3 @@ class TranslationService {
     }
   }
 }
-

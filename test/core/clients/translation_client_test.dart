@@ -9,7 +9,7 @@ void main() {
     test('translate returns TranslationResponse on 200 status', () async {
       final mockClient = MockClient((request) async {
         expect(request.url.queryParameters['q'], 'Hello World');
-        expect(request.url.queryParameters['langpair'], 'autodetect|es');
+        expect(request.url.queryParameters['langpair'], 'en|es');
         return http.Response(
           jsonEncode({
             'responseData': {'translatedText': 'Hola Mundo', 'match': 1},
@@ -21,7 +21,11 @@ void main() {
 
       final client = TranslationClient(client: mockClient);
       final response = await client.translate(
-        const TranslationRequest(text: 'Hello World', targetLanguage: 'es'),
+        const TranslationRequest(
+          text: 'Hello World',
+          targetLanguage: 'es',
+          sourceLanguage: 'en',
+        ),
       );
 
       expect(response, isNotNull);
@@ -40,7 +44,11 @@ void main() {
 
       final client = TranslationClient(client: mockClient);
       final response = await client.translate(
-        const TranslationRequest(text: '   ', targetLanguage: 'es'),
+        const TranslationRequest(
+          text: '   ',
+          targetLanguage: 'es',
+          sourceLanguage: 'en',
+        ),
       );
 
       expect(called, isFalse);
@@ -55,7 +63,11 @@ void main() {
 
       final client = TranslationClient(client: mockClient);
       final response = await client.translate(
-        const TranslationRequest(text: 'Hello', targetLanguage: 'es'),
+        const TranslationRequest(
+          text: 'Hello',
+          targetLanguage: 'es',
+          sourceLanguage: 'en',
+        ),
       );
 
       expect(response, isNull);
@@ -68,7 +80,11 @@ void main() {
 
       final client = TranslationClient(client: mockClient);
       final response = await client.translate(
-        const TranslationRequest(text: 'Hello', targetLanguage: 'es'),
+        const TranslationRequest(
+          text: 'Hello',
+          targetLanguage: 'es',
+          sourceLanguage: 'en',
+        ),
       );
 
       expect(response, isNull);

@@ -136,6 +136,68 @@ void main() {
       expect(lines[1].original, 'Line 2');
     });
 
+    test('different lyrics revisions produce distinct cache keys', () {
+      final service = TranslationService(cacheBox: cacheBox);
+      final key1 = service.computeCacheKey(
+        songId: 'song-1',
+        lyrics: 'Original lyrics version 1',
+        targetLanguage: 'es',
+      );
+      final key2 = service.computeCacheKey(
+        songId: 'song-1',
+        lyrics: 'Updated lyrics version 2 with new chords',
+        targetLanguage: 'es',
+      );
+      expect(key1, isNot(equals(key2)));
+    });
+
+    test('partial translation failure does not cache incomplete results',
+        () async {
+      var callCount = 0;
+      final mockClient = MockClient((request) async {
+        callCount++;
+        final q = request.url.queryParameters['q'];
+        if (q == 'Line 1') {
+          return http.Response(
+            jsonEncode({
+              'responseData': {'translatedText': 'Línea 1'},
+              'responseStatus': 200,
+            }),
+            200,
+          );
+        }
+        // Second line fails
+        return http.Response('Internal Error', 500);
+      });
+
+      final translationClient = TranslationClient(client: mockClient);
+      final service = TranslationService(
+        client: translationClient,
+        cacheBox: cacheBox,
+      );
+
+      const lyrics = 'Line 1\nLine 2';
+      final cacheKey = service.computeCacheKey(
+        songId: 'song-partial',
+        lyrics: lyrics,
+        targetLanguage: 'es',
+      );
+
+      final lines = await service.translateLyrics(
+        lyrics: lyrics,
+        targetLanguage: 'es',
+        songId: 'song-partial',
+      );
+
+      expect(callCount, 2);
+      expect(lines.length, 2);
+      expect(lines[0].translation, 'Línea 1');
+      expect(lines[1].hasTranslation, isFalse);
+
+      // Verify incomplete result was NOT cached
+      expect(cacheBox.containsKey(cacheKey), isFalse);
+    });
+
     test('returns empty list for empty lyrics', () async {
       final service = TranslationService(cacheBox: cacheBox);
       final lines = await service.translateLyrics(
