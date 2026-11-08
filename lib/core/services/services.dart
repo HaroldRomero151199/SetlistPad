@@ -1,7 +1,10 @@
+export 'lyrics_export_service.dart';
 export 'lyrics_service.dart';
+export 'translation_service.dart';
 export 'youtube_service.dart';
 export 'models/youtube_metadata.dart';
 export 'models/youtube_playlist_item.dart';
 export 'models/youtube_playlist_metadata.dart';
 export 'utils/candidate_match_scorer.dart';
+export 'utils/language_detector.dart';
 export 'utils/track_title_sanitizer.dart';

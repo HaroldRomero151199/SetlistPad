@@ -325,4 +325,34 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorSingleVideoNotPlaylist =>
       'This link is for a single song, not a playlist. You can import it from the Library tab.';
+
+  @override
+  String get bilingualLyrics => 'Bilingual Lyrics';
+
+  @override
+  String get originalLyrics => 'Original Lyrics';
+
+  @override
+  String get targetLanguage => 'Target Language';
+
+  @override
+  String get translateLyrics => 'Translate';
+
+  @override
+  String get translatingLyrics => 'Translating lyrics...';
+
+  @override
+  String get translationError =>
+      'Could not complete translation. Showing original text.';
+
+  @override
+  String get exportBilingualTxt => 'Export (.txt)';
+
+  @override
+  String exportSuccess(String path) {
+    return 'Exported to $path';
+  }
+
+  @override
+  String get exportFailed => 'Failed to export file';
 }

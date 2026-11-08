@@ -1,10 +1,17 @@
 export 'domain/models/song_model.dart';
+export 'domain/models/bilingual_line.dart';
 export 'data/repositories/song_repository.dart';
 export 'presentation/providers/songs_notifier.dart';
+export 'presentation/providers/bilingual_lyrics_state.dart';
+export 'presentation/providers/bilingual_lyrics_notifier.dart';
 export 'presentation/screens/songs_screen.dart';
 export 'presentation/screens/song_detail_screen.dart';
 export 'presentation/views/song_empty_lyrics_view.dart';
 export 'presentation/views/song_lyrics_edit_view.dart';
 export 'presentation/views/song_lyrics_view.dart';
+export 'presentation/views/song_bilingual_lyrics_view.dart';
+export 'presentation/widgets/bilingual_line_tile.dart';
+export 'presentation/widgets/bilingual_language_selector.dart';
 export 'presentation/widgets/import_song_dialog.dart';
 export 'presentation/widgets/song_font_size_toolbar.dart';
+export 'presentation/utils/bilingual_lyrics_parser.dart';
