@@ -52,7 +52,8 @@ lib/features/songs/
      - Read/Performance mode: renders `SongLyricsView` coupled with `SongFontSizeToolbar`.
      - Bilingual translation mode: renders `SongBilingualLyricsView` displaying the original line on top and the translated verse directly below, integrated with `BilingualLanguageSelector` and `SongFontSizeToolbar`.
 3. **Interlinear Translation & Caching**:
-   - `TranslationService` queries external translation endpoints (MyMemory API) with fallback, and caches results in Hive (`translations_cache_box`) keyed by song and language to avoid redundant requests.
+   - `TranslationService` resolves the source language heuristically via `LanguageDetector` (analyzing diacritics and stopword frequencies for valid ISO 639-1 codes) before querying external translation endpoints (MyMemory API).
+   - Fully resolved translations are cached in Hive (`translations_cache_box`) using a composite key of `songId`, a content hash of the lyrics, and the target language (`${songId}_${lyricsHash}_$targetLang`). This guarantees automatic cache invalidation whenever lyrics are edited or re-downloaded, and prevents partial failures from being permanently cached.
    - `BilingualLyricsParser` preserves stanza breaks, line breaks, and alignment without desynchronizing verse order.
 4. **Bilingual Text Export**:
    - `LyricsExportService` generates clean alternating `.txt` files in local storage with sanitized filenames for easy reading and sharing.

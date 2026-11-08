@@ -21,6 +21,10 @@ lib/core/
 │   │   ├── models/                         # DTOs: oEmbed and playlist track items/responses
 │   │   ├── youtube_client.dart
 │   │   └── youtube.dart
+│   ├── translation/                        # Translation API client (MyMemory API integration)
+│   │   ├── models/                         # DTOs: TranslationRequest, TranslationResponse
+│   │   ├── translation_client.dart
+│   │   └── translation.dart
 │   └── clients.dart                        # Unified barrel export for all HTTP clients
 ├── config/
 │   ├── api_config.dart                     # API endpoint constants and request timeouts
@@ -34,8 +38,11 @@ lib/core/
 │   ├── models/                             # Service-layer DTOs (YouTubePlaylistItem, metadata models)
 │   ├── utils/                              # Business algorithmic utilities
 │   │   ├── candidate_match_scorer.dart     # Levenshtein distance & token overlap fuzzy matching scorer
+│   │   ├── language_detector.dart          # Heuristic stopword & diacritic analyzer for ISO 639-1 language detection
 │   │   └── track_title_sanitizer.dart      # Regex pipeline stripping YouTube junk from track titles
+│   ├── lyrics_export_service.dart          # Formats and exports alternating bilingual lyrics to .txt files
 │   ├── lyrics_service.dart                 # Two-stage lyrics orchestrator (LRCLIB -> Lyrics.ovh fallback)
+│   ├── translation_service.dart            # Interlinear lyrics translation, language detection, and Hive caching
 │   ├── youtube_service.dart                # URL parser and metadata extractor
 │   └── services.dart
 └── theme/

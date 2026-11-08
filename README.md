@@ -15,6 +15,11 @@ A modern, offline-first Flutter application tailored for live musicians and band
 - **Intelligent Online Lyrics Engine**:
   - Two-stage multi-source lyrics lookup via **LRCLIB** and **Lyrics.ovh**.
   - Advanced fuzzy matching scoring candidates using token overlap and Levenshtein similarity.
+- **Interlinear Bilingual Lyrics & Text Export**:
+  - Stage-ready interlinear translation displaying the translated verse directly below each original line in monospace format.
+  - Heuristic source language detection via diacritics and stopword frequencies with multiple target language options (ES, EN, PT, FR, IT, DE).
+  - Offline Hive caching keyed by lyrics content fingerprint to eliminate duplicate network calls and automatically invalidate upon edits.
+  - Plain text (`.txt`) file export with alternating verse formatting for offline rehearsal or printing.
 - **Stage-Ready Performance Viewer**:
   - Monospace font typography ensuring chord alignment over lyrics.
   - Dynamic font scale controls for stage readability.
@@ -33,7 +38,7 @@ lib/
 ├── core/                   # Shared cross-cutting modules (clients, services, theme, config)
 ├── features/
 │   ├── playlists/          # Playlists domain, repository, screens, views, widgets, and utils
-│   └── songs/              # Songs domain, repository, screens, and widgets
+│   └── songs/              # Songs domain, repository, screens, views, widgets, and utils
 └── l10n/                   # ARB localization definitions and generated classes
 ```
 
