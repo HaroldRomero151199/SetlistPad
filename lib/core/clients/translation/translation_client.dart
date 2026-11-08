@@ -52,13 +52,18 @@ class TranslationClient {
   Future<String?> translateText({
     required String text,
     required String targetLanguage,
-    String sourceLanguage = 'autodetect',
+    String? sourceLanguage,
   }) async {
+    final cleanTarget = targetLanguage.toLowerCase().trim();
+    final resolvedSource = (sourceLanguage != null && sourceLanguage.trim().isNotEmpty)
+        ? sourceLanguage.toLowerCase().trim()
+        : (cleanTarget == 'en' ? 'es' : 'en');
+
     final response = await translate(
       TranslationRequest(
         text: text,
-        targetLanguage: targetLanguage,
-        sourceLanguage: sourceLanguage,
+        targetLanguage: cleanTarget,
+        sourceLanguage: resolvedSource,
       ),
     );
 

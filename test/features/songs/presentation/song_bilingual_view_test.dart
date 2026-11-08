@@ -1,72 +1,13 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:setlist_pad/core/providers/providers.dart';
-import 'package:setlist_pad/core/services/services.dart';
 import 'package:setlist_pad/features/songs/songs.dart';
 import 'package:setlist_pad/l10n/app_localizations.dart';
-
-class FakeSongRepository implements SongRepository {
-  final List<Song> _songs = [];
-
-  @override
-  Future<void> deleteSong(String id) async {
-    _songs.removeWhere((s) => s.id == id);
-  }
-
-  @override
-  Future<List<Song>> getAllSongs() async => List.unmodifiable(_songs);
-
-  @override
-  Future<Song?> getSongById(String id) async {
-    try {
-      return _songs.firstWhere((s) => s.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> saveSong(Song song) async {
-    _songs.add(song);
-  }
-
-  @override
-  Future<List<Song>> searchSongs(String query) async => _songs;
-}
-
-class FakeTranslationService extends TranslationService {
-  @override
-  Future<List<BilingualLine>> translateLyrics({
-    required String lyrics,
-    required String targetLanguage,
-    String? songId,
-    String sourceLanguage = 'autodetect',
-  }) async {
-    return [
-      BilingualLine(
-        lineNumber: 1,
-        original: 'Hello World',
-        translation: 'Hola Mundo ($targetLanguage)',
-      ),
-    ];
-  }
-}
-
-class FakeLyricsExportService extends LyricsExportService {
-  @override
-  Future<File> exportBilingualLyrics({
-    required String title,
-    required String artist,
-    required List<BilingualLine> lines,
-    required String targetLanguage,
-    Directory? destinationDirectory,
-  }) async {
-    return File('test_export.txt');
-  }
-}
+import '../../../fakes/fake_lyrics_export_service.dart';
+import '../../../fakes/fake_song_repository.dart';
+import '../../../fakes/fake_translation_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

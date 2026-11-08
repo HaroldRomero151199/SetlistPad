@@ -36,6 +36,10 @@ final bilingualLyricsParserProvider = Provider<BilingualLyricsParser>((ref) {
   return const BilingualLyricsParser();
 });
 
+final languageDetectorProvider = Provider<LanguageDetector>((ref) {
+  return const LanguageDetector();
+});
+
 final translationCacheBoxProvider = Provider<Box<String>?>((ref) {
   if (Hive.isBoxOpen(HiveBoxes.translationsCache)) {
     return Hive.box<String>(HiveBoxes.translationsCache);
@@ -73,6 +77,7 @@ final translationServiceProvider = Provider<TranslationService>((ref) {
     client: ref.watch(translationClientProvider),
     cacheBox: ref.watch(translationCacheBoxProvider),
     parser: ref.watch(bilingualLyricsParserProvider),
+    languageDetector: ref.watch(languageDetectorProvider),
   );
 });
 

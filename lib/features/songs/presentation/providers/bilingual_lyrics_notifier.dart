@@ -11,6 +11,7 @@ class BilingualLyricsNotifier extends Notifier<BilingualLyricsState> {
   final TranslationService? _translationService;
   final LyricsExportService? _exportService;
   final BilingualLyricsParser? _parser;
+  int _currentRequestId = 0;
 
   BilingualLyricsNotifier({
     TranslationService? translationService,
@@ -36,6 +37,7 @@ class BilingualLyricsNotifier extends Notifier<BilingualLyricsState> {
 
   /// Resets bilingual state back to initial default
   void reset() {
+    _currentRequestId++;
     state = const BilingualLyricsState();
   }
 
@@ -83,6 +85,10 @@ class BilingualLyricsNotifier extends Notifier<BilingualLyricsState> {
       return;
     }
 
+    final requestId = ++_currentRequestId;
+    final targetLang = state.targetLanguage;
+    final currentSongId = song.id;
+
     // Preserve existing lines or original lines so lyrics remain readable during translation
     final baseLines = (state.songId == song.id && state.lines.isNotEmpty)
         ? state.lines
@@ -100,15 +106,22 @@ class BilingualLyricsNotifier extends Notifier<BilingualLyricsState> {
         await translationService.clearCache(
           songId: song.id,
           lyrics: song.lyrics,
-          targetLanguage: state.targetLanguage,
+          targetLanguage: targetLang,
         );
       }
 
       final bilingualLines = await translationService.translateLyrics(
         lyrics: song.lyrics,
-        targetLanguage: state.targetLanguage,
+        targetLanguage: targetLang,
         songId: song.id,
       );
+
+      // Discard response if superseded by a newer request or if song changed
+      if (requestId != _currentRequestId ||
+          state.songId != currentSongId ||
+          state.targetLanguage != targetLang) {
+        return;
+      }
 
       state = state.copyWith(
         songId: song.id,
@@ -116,6 +129,12 @@ class BilingualLyricsNotifier extends Notifier<BilingualLyricsState> {
         isLoading: false,
       );
     } catch (e) {
+      if (requestId != _currentRequestId ||
+          state.songId != currentSongId ||
+          state.targetLanguage != targetLang) {
+        return;
+      }
+
       // Graceful fallback to original lines without crash
       final fallbackLines = parser.parse(originalLyrics: song.lyrics);
       state = state.copyWith(
