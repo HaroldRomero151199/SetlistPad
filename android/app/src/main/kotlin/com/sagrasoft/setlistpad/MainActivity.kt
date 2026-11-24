@@ -1,4 +1,4 @@
-package com.example.setlist_pad
+package com.sagrasoft.setlistpad
 
 import io.flutter.embedding.android.FlutterActivity
 
