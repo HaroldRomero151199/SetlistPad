@@ -479,6 +479,71 @@ void main() {
     );
 
     testWidgets(
+      'Undo restores removed middle song at its original playlist position',
+      (tester) async {
+        final now = DateTime.now();
+        final songA = Song(
+          id: 'song-A',
+          title: 'Song A',
+          artist: 'Artist A',
+          lyrics: 'Lyrics A',
+          createdAt: now,
+          updatedAt: now,
+        );
+        final songB = Song(
+          id: 'song-B',
+          title: 'Song B',
+          artist: 'Artist B',
+          lyrics: 'Lyrics B',
+          createdAt: now,
+          updatedAt: now,
+        );
+        final songC = Song(
+          id: 'song-C',
+          title: 'Song C',
+          artist: 'Artist C',
+          lyrics: 'Lyrics C',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakeSongRepo.saveSong(songA);
+        await fakeSongRepo.saveSong(songB);
+        await fakeSongRepo.saveSong(songC);
+
+        final playlist = Playlist(
+          id: 'pl-undo-order',
+          name: 'Ordered Set',
+          songIds: const ['song-A', 'song-B', 'song-C'],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(buildSubject(
+          playlist: playlist,
+          locale: const Locale('es'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Remove the middle song (Song B, index 1)
+        await tester.tap(find.byIcon(Icons.remove_circle_outline).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        var updated = await fakePlaylistRepo.getPlaylistById('pl-undo-order');
+        expect(updated!.songIds, ['song-A', 'song-C']);
+
+        // Undo should restore Song B back to index 1 ([A, B, C])
+        await tester.tap(find.text('Deshacer'));
+        await tester.pumpAndSettle();
+
+        updated = await fakePlaylistRepo.getPlaylistById('pl-undo-order');
+        expect(updated!.songIds, ['song-A', 'song-B', 'song-C']);
+      },
+    );
+
+    testWidgets(
       'Song removal SnackBar auto-dismisses after timeout despite Undo action',
       (tester) async {
         final now = DateTime.now();

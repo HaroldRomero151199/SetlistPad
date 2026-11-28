@@ -7,87 +7,16 @@ import 'package:setlist_pad/core/services/services.dart';
 import 'package:setlist_pad/features/playlists/playlists.dart';
 import 'package:setlist_pad/features/songs/songs.dart';
 import 'package:setlist_pad/l10n/app_localizations.dart';
-
-class _FakeSongRepository implements SongRepository {
-  final List<Song> songs = [];
-
-  @override
-  Future<void> deleteSong(String id) async {
-    songs.removeWhere((s) => s.id == id);
-  }
-
-  @override
-  Future<List<Song>> getAllSongs() async => List.unmodifiable(songs);
-
-  @override
-  Future<Song?> getSongById(String id) async {
-    try {
-      return songs.firstWhere((s) => s.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> saveSong(Song song) async {
-    songs.removeWhere((s) => s.id == song.id);
-    songs.add(song);
-  }
-
-  @override
-  Future<List<Song>> searchSongs(String query) async => songs;
-}
-
-class _FakePlaylistRepository implements PlaylistRepository {
-  final List<Playlist> playlists = [];
-
-  @override
-  Future<List<Playlist>> getAllPlaylists() async => List.unmodifiable(playlists);
-
-  @override
-  Future<Playlist?> getPlaylistById(String id) async {
-    try {
-      return playlists.firstWhere((p) => p.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> savePlaylist(Playlist playlist) async {
-    playlists.removeWhere((p) => p.id == playlist.id);
-    playlists.add(playlist);
-  }
-
-  @override
-  Future<void> deletePlaylist(String id) async {
-    playlists.removeWhere((p) => p.id == id);
-  }
-
-  @override
-  Future<void> addSongToPlaylist(String playlistId, String songId) async {}
-
-  @override
-  Future<void> removeSongFromPlaylist(String playlistId, String songId) async {}
-
-  @override
-  Future<void> removeSongFromAllPlaylists(String songId) async {
-    for (int i = 0; i < playlists.length; i++) {
-      if (playlists[i].songIds.contains(songId)) {
-        final list = List<String>.from(playlists[i].songIds)..remove(songId);
-        playlists[i] = playlists[i].copyWith(songIds: list);
-      }
-    }
-  }
-}
+import '../../../fakes/fake_playlist_repository.dart';
+import '../../../fakes/fake_song_repository.dart';
 
 void main() {
-  late _FakeSongRepository fakeSongRepo;
-  late _FakePlaylistRepository fakePlaylistRepo;
+  late FakeSongRepository fakeSongRepo;
+  late FakePlaylistRepository fakePlaylistRepo;
 
   setUp(() {
-    fakeSongRepo = _FakeSongRepository();
-    fakePlaylistRepo = _FakePlaylistRepository();
+    fakeSongRepo = FakeSongRepository();
+    fakePlaylistRepo = FakePlaylistRepository();
   });
 
   Widget buildSubject({Locale locale = const Locale('es')}) {

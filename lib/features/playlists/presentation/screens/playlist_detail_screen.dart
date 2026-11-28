@@ -50,6 +50,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(playlistsNotifierProvider.notifier);
+    final originalIndex = currentPlaylist.songIds.indexOf(song.id);
 
     final confirmed = await ConfirmDeleteDialog.show(
       context: context,
@@ -72,7 +73,15 @@ class PlaylistDetailScreen extends ConsumerWidget {
           action: SnackBarAction(
             label: l10n.undo,
             onPressed: () {
-              notifier.addSongToPlaylist(currentPlaylist.id, song.id);
+              if (originalIndex >= 0) {
+                notifier.restoreSongToPlaylist(
+                  currentPlaylist.id,
+                  song.id,
+                  originalIndex,
+                );
+              } else {
+                notifier.addSongToPlaylist(currentPlaylist.id, song.id);
+              }
             },
           ),
         ),
