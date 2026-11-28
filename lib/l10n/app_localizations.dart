@@ -607,6 +607,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to export file'**
   String get exportFailed;
+
+  /// Destructive delete confirmation button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// SnackBar action label to undo a recent action
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// Tooltip for remove song button inside a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Remove song from playlist'**
+  String get removeSongFromPlaylistTooltip;
+
+  /// Dialog title when confirming removal of a song from a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Song from Playlist'**
+  String get removeSongFromPlaylistTitle;
+
+  /// Confirmation message when removing a song from a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove \"{title}\" from this playlist?'**
+  String removeSongFromPlaylistMessage(String title);
+
+  /// Dialog title when confirming deletion of an entire playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Playlist'**
+  String get deletePlaylistTitle;
+
+  /// Confirmation message when deleting a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{name}\"? This action cannot be undone.'**
+  String deletePlaylistMessage(String name);
+
+  /// SnackBar message after removing a song from a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Removed \"{title}\" from playlist'**
+  String songRemovedFromPlaylist(String title);
+
+  /// SnackBar message after deleting a playlist
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted playlist \"{name}\"'**
+  String playlistDeleted(String name);
+
+  /// Tooltip for delete song button in the Song Library
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Song'**
+  String get deleteSongTooltip;
+
+  /// Dialog title when confirming permanent deletion of a song from the library
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Song'**
+  String get deleteSongTitle;
+
+  /// Confirmation message when deleting a song from the library
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{title}\" from your library? It will also be removed from all playlists.'**
+  String deleteSongMessage(String title);
+
+  /// SnackBar message after deleting a song from the library
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted \"{title}\" from library'**
+  String songDeleted(String title);
 }
 
 class _AppLocalizationsDelegate

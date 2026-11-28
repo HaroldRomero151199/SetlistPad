@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../domain/models/playlist_model.dart';
 import '../providers/playlists_notifier.dart';
 import '../widgets/import_playlist_dialog.dart';
 import 'playlist_detail_screen.dart';
@@ -78,6 +80,34 @@ class PlaylistsScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  Future<void> _confirmDeletePlaylist(
+    BuildContext context,
+    WidgetRef ref,
+    Playlist playlist,
+  ) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(playlistsNotifierProvider.notifier);
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context: context,
+      title: l10n.deletePlaylistTitle,
+      message: l10n.deletePlaylistMessage(playlist.name),
+      confirmLabel: l10n.delete,
+    );
+
+    if (!confirmed) return;
+
+    await notifier.deletePlaylist(playlist.id);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.playlistDeleted(playlist.name)),
+        ),
+      );
   }
 
   void _showImportPlaylistDialog(BuildContext context) {
@@ -161,11 +191,8 @@ class PlaylistsScreen extends ConsumerWidget {
                   ),
                   trailing: IconButton(
                     icon: Icon(Icons.delete_outline, color: context.colorScheme.onSurfaceVariant),
-                    onPressed: () {
-                      ref
-                          .read(playlistsNotifierProvider.notifier)
-                          .deletePlaylist(playlist.id);
-                    },
+                    tooltip: context.l10n.deletePlaylistTooltip,
+                    onPressed: () => _confirmDeletePlaylist(context, ref, playlist),
                   ),
                   onTap: () {
                     Navigator.of(context).push(

@@ -133,6 +133,28 @@ class PlaylistsNotifier extends Notifier<AsyncValue<List<Playlist>>> {
     await loadPlaylists();
   }
 
+  /// Restores a previously removed song at its original [index] in the playlist.
+  Future<void> restoreSongToPlaylist(
+    String playlistId,
+    String songId,
+    int index,
+  ) async {
+    final playlist = await repository.getPlaylistById(playlistId);
+    if (playlist == null || playlist.songIds.contains(songId)) return;
+
+    final updatedSongs = List<String>.from(playlist.songIds);
+    final clampedIndex = index.clamp(0, updatedSongs.length);
+    updatedSongs.insert(clampedIndex, songId);
+
+    await repository.savePlaylist(
+      playlist.copyWith(
+        songIds: updatedSongs,
+        updatedAt: DateTime.now(),
+      ),
+    );
+    await loadPlaylists();
+  }
+
   Future<void> removeSongFromAllPlaylists(String songId) async {
     await repository.removeSongFromAllPlaylists(songId);
     await loadPlaylists();

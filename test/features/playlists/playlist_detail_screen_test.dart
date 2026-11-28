@@ -368,6 +368,358 @@ void main() {
         expect(find.text('Song A'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'Removing a song opens confirmation dialog and keeps song on Cancel',
+      (tester) async {
+        final now = DateTime.now();
+        final songA = Song(
+          id: 'song-A',
+          title: 'Bohemian Rhapsody',
+          artist: 'Queen',
+          youtubeUrl: 'https://www.youtube.com/watch?v=vidA',
+          lyrics: 'Lyrics A',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakeSongRepo.saveSong(songA);
+
+        final playlist = Playlist(
+          id: 'pl-confirm-cancel',
+          name: 'Rock Set',
+          songIds: ['song-A'],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(buildSubject(
+          playlist: playlist,
+          locale: const Locale('es'),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.remove_circle_outline));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Eliminar canción de la lista'), findsOneWidget);
+        expect(
+          find.text(
+            '¿Estás seguro de que deseas eliminar "Bohemian Rhapsody" de esta lista de reproducción?',
+          ),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Cancelar'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.text('Bohemian Rhapsody'), findsOneWidget);
+        final updated = await fakePlaylistRepo.getPlaylistById('pl-confirm-cancel');
+        expect(updated!.songIds, ['song-A']);
+      },
+    );
+
+    testWidgets(
+      'Confirming song removal removes song, shows SnackBar, and supports Undo',
+      (tester) async {
+        final now = DateTime.now();
+        final songA = Song(
+          id: 'song-A',
+          title: 'Bohemian Rhapsody',
+          artist: 'Queen',
+          youtubeUrl: 'https://www.youtube.com/watch?v=vidA',
+          lyrics: 'Lyrics A',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakeSongRepo.saveSong(songA);
+
+        final playlist = Playlist(
+          id: 'pl-confirm-remove',
+          name: 'Rock Set',
+          songIds: ['song-A'],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(buildSubject(
+          playlist: playlist,
+          locale: const Locale('es'),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.remove_circle_outline));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.text('Bohemian Rhapsody'), findsNothing);
+        expect(
+          find.text('Se eliminó "Bohemian Rhapsody" de la lista'),
+          findsOneWidget,
+        );
+        expect(find.text('Deshacer'), findsOneWidget);
+
+        var updated = await fakePlaylistRepo.getPlaylistById('pl-confirm-remove');
+        expect(updated!.songIds, isEmpty);
+
+        // Tap Undo in SnackBar
+        await tester.tap(find.text('Deshacer'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Bohemian Rhapsody'), findsOneWidget);
+        updated = await fakePlaylistRepo.getPlaylistById('pl-confirm-remove');
+        expect(updated!.songIds, ['song-A']);
+      },
+    );
+
+    testWidgets(
+      'Undo restores removed middle song at its original playlist position',
+      (tester) async {
+        final now = DateTime.now();
+        final songA = Song(
+          id: 'song-A',
+          title: 'Song A',
+          artist: 'Artist A',
+          lyrics: 'Lyrics A',
+          createdAt: now,
+          updatedAt: now,
+        );
+        final songB = Song(
+          id: 'song-B',
+          title: 'Song B',
+          artist: 'Artist B',
+          lyrics: 'Lyrics B',
+          createdAt: now,
+          updatedAt: now,
+        );
+        final songC = Song(
+          id: 'song-C',
+          title: 'Song C',
+          artist: 'Artist C',
+          lyrics: 'Lyrics C',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakeSongRepo.saveSong(songA);
+        await fakeSongRepo.saveSong(songB);
+        await fakeSongRepo.saveSong(songC);
+
+        final playlist = Playlist(
+          id: 'pl-undo-order',
+          name: 'Ordered Set',
+          songIds: const ['song-A', 'song-B', 'song-C'],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(buildSubject(
+          playlist: playlist,
+          locale: const Locale('es'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Remove the middle song (Song B, index 1)
+        await tester.tap(find.byIcon(Icons.remove_circle_outline).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        var updated = await fakePlaylistRepo.getPlaylistById('pl-undo-order');
+        expect(updated!.songIds, ['song-A', 'song-C']);
+
+        // Undo should restore Song B back to index 1 ([A, B, C])
+        await tester.tap(find.text('Deshacer'));
+        await tester.pumpAndSettle();
+
+        updated = await fakePlaylistRepo.getPlaylistById('pl-undo-order');
+        expect(updated!.songIds, ['song-A', 'song-B', 'song-C']);
+      },
+    );
+
+    testWidgets(
+      'Song removal SnackBar auto-dismisses after timeout despite Undo action',
+      (tester) async {
+        final now = DateTime.now();
+        final songA = Song(
+          id: 'song-A',
+          title: 'Bohemian Rhapsody',
+          artist: 'Queen',
+          youtubeUrl: 'https://www.youtube.com/watch?v=vidA',
+          lyrics: 'Lyrics A',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakeSongRepo.saveSong(songA);
+
+        final playlist = Playlist(
+          id: 'pl-snack-timeout',
+          name: 'Rock Set',
+          songIds: ['song-A'],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(buildSubject(
+          playlist: playlist,
+          locale: const Locale('es'),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.remove_circle_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Se eliminó "Bohemian Rhapsody" de la lista'),
+          findsOneWidget,
+        );
+
+        // Advance past the 4-second SnackBar duration and exit animation.
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Se eliminó "Bohemian Rhapsody" de la lista'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'Deleting playlist from AppBar requires confirmation and keeps playlist on Cancel',
+      (tester) async {
+        final now = DateTime.now();
+        final playlist = Playlist(
+          id: 'pl-del-cancel',
+          name: 'Saturday Gig',
+          songIds: const [],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(buildSubject(
+          playlist: playlist,
+          locale: const Locale('en'),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Delete Playlist'), findsOneWidget);
+        expect(
+          find.text(
+            'Are you sure you want to delete "Saturday Gig"? This action cannot be undone.',
+          ),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.text('Saturday Gig'), findsOneWidget);
+        final stillExists = await fakePlaylistRepo.getPlaylistById('pl-del-cancel');
+        expect(stillExists, isNotNull);
+      },
+    );
+
+    testWidgets(
+      'Confirming playlist deletion from AppBar deletes playlist, pops route, and shows SnackBar',
+      (tester) async {
+        final now = DateTime.now();
+        final playlist = Playlist(
+          id: 'pl-del-confirm',
+          name: 'Saturday Gig',
+          songIds: const [],
+          createdAt: now,
+          updatedAt: now,
+        );
+        await fakePlaylistRepo.savePlaylist(playlist);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              songRepositoryProvider.overrideWithValue(fakeSongRepo),
+              playlistRepositoryProvider.overrideWithValue(fakePlaylistRepo),
+              youtubeServiceProvider.overrideWithValue(fakeYouTubeService),
+              lyricsServiceProvider.overrideWithValue(fakeLyricsService),
+              playlistsNotifierProvider.overrideWith(
+                () => PlaylistsNotifier(
+                  repository: fakePlaylistRepo,
+                  songRepository: fakeSongRepo,
+                  youtubeService: fakeYouTubeService,
+                  lyricsService: fakeLyricsService,
+                ),
+              ),
+              songsNotifierProvider.overrideWith(
+                () => SongsNotifier(
+                  repository: fakeSongRepo,
+                  playlistRepository: fakePlaylistRepo,
+                  youtubeService: fakeYouTubeService,
+                  lyricsService: fakeLyricsService,
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              locale: const Locale('es'),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Builder(
+                builder: (context) => Scaffold(
+                  body: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PlaylistDetailScreen(playlist: playlist),
+                        ),
+                      );
+                    },
+                    child: const Text('Open Detail'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Open Detail'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(PlaylistDetailScreen), findsOneWidget);
+
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(PlaylistDetailScreen), findsNothing);
+        expect(find.text('Open Detail'), findsOneWidget);
+        expect(find.text('Se eliminó la lista "Saturday Gig"'), findsOneWidget);
+
+        final deleted = await fakePlaylistRepo.getPlaylistById('pl-del-confirm');
+        expect(deleted, isNull);
+      },
+    );
   });
 }
 
