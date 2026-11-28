@@ -9,6 +9,76 @@ class PlaylistDetailScreen extends ConsumerWidget {
 
   const PlaylistDetailScreen({super.key, required this.playlist});
 
+  Future<void> _confirmDeletePlaylist(
+    BuildContext context,
+    WidgetRef ref,
+    Playlist currentPlaylist,
+  ) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final notifier = ref.read(playlistsNotifierProvider.notifier);
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context: context,
+      title: l10n.deletePlaylistTitle,
+      message: l10n.deletePlaylistMessage(currentPlaylist.name),
+      confirmLabel: l10n.delete,
+    );
+
+    if (!confirmed) return;
+
+    await notifier.deletePlaylist(currentPlaylist.id);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.playlistDeleted(currentPlaylist.name)),
+        ),
+      );
+  }
+
+  Future<void> _confirmRemoveSong(
+    BuildContext context,
+    WidgetRef ref,
+    Playlist currentPlaylist,
+    Song song,
+  ) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(playlistsNotifierProvider.notifier);
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context: context,
+      title: l10n.removeSongFromPlaylistTitle,
+      message: l10n.removeSongFromPlaylistMessage(song.title),
+      confirmLabel: l10n.delete,
+    );
+
+    if (!confirmed) return;
+
+    await notifier.removeSongFromPlaylist(currentPlaylist.id, song.id);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.songRemovedFromPlaylist(song.title)),
+          duration: const Duration(seconds: 4),
+          // Explicitly disable persistence so SnackBars with Undo still auto-dismiss.
+          persist: false,
+          action: SnackBarAction(
+            label: l10n.undo,
+            onPressed: () {
+              notifier.addSongToPlaylist(currentPlaylist.id, song.id);
+            },
+          ),
+        ),
+      );
+  }
+
   Future<void> _syncPlaylist(
     BuildContext context,
     WidgetRef ref,
@@ -186,12 +256,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
             tooltip: context.l10n.deletePlaylistTooltip,
             onPressed: isSyncing
                 ? null
-                : () {
-                    ref
-                        .read(playlistsNotifierProvider.notifier)
-                        .deletePlaylist(currentPlaylist.id);
-                    Navigator.of(context).pop();
-                  },
+                : () => _confirmDeletePlaylist(context, ref, currentPlaylist),
           ),
         ],
       ),
@@ -251,12 +316,13 @@ class PlaylistDetailScreen extends ConsumerWidget {
                         trailing: IconButton(
                           icon: Icon(Icons.remove_circle_outline,
                               color: context.colorScheme.onSurfaceVariant),
-                          onPressed: () {
-                            ref
-                                .read(playlistsNotifierProvider.notifier)
-                                .removeSongFromPlaylist(
-                                    currentPlaylist.id, song.id);
-                          },
+                          tooltip: context.l10n.removeSongFromPlaylistTooltip,
+                          onPressed: () => _confirmRemoveSong(
+                            context,
+                            ref,
+                            currentPlaylist,
+                            song,
+                          ),
                         ),
                         onTap: () {
                           Navigator.of(context).push(

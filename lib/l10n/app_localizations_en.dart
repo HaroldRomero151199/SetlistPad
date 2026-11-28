@@ -355,4 +355,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportFailed => 'Failed to export file';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get removeSongFromPlaylistTooltip => 'Remove song from playlist';
+
+  @override
+  String get removeSongFromPlaylistTitle => 'Remove Song from Playlist';
+
+  @override
+  String removeSongFromPlaylistMessage(String title) {
+    return 'Are you sure you want to remove \"$title\" from this playlist?';
+  }
+
+  @override
+  String get deletePlaylistTitle => 'Delete Playlist';
+
+  @override
+  String deletePlaylistMessage(String name) {
+    return 'Are you sure you want to delete \"$name\"? This action cannot be undone.';
+  }
+
+  @override
+  String songRemovedFromPlaylist(String title) {
+    return 'Removed \"$title\" from playlist';
+  }
+
+  @override
+  String playlistDeleted(String name) {
+    return 'Deleted playlist \"$name\"';
+  }
+
+  @override
+  String get deleteSongTooltip => 'Delete Song';
+
+  @override
+  String get deleteSongTitle => 'Delete Song';
+
+  @override
+  String deleteSongMessage(String title) {
+    return 'Are you sure you want to delete \"$title\" from your library? It will also be removed from all playlists.';
+  }
+
+  @override
+  String songDeleted(String title) {
+    return 'Deleted \"$title\" from library';
+  }
 }

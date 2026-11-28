@@ -47,4 +47,6 @@ lib/core/
 │   └── services.dart
 └── theme/
     └── app_theme.dart                      # Material 3 Dark theme, typography, and BuildContextThemeX extensions
+└── widgets/
+    └── confirm_delete_dialog.dart          # Shared modal confirmation dialog for destructive actions
 ```

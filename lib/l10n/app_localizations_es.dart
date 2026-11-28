@@ -356,4 +356,55 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get exportFailed => 'Error al exportar el archivo';
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String get undo => 'Deshacer';
+
+  @override
+  String get removeSongFromPlaylistTooltip => 'Eliminar canción de la lista';
+
+  @override
+  String get removeSongFromPlaylistTitle => 'Eliminar canción de la lista';
+
+  @override
+  String removeSongFromPlaylistMessage(String title) {
+    return '¿Estás seguro de que deseas eliminar \"$title\" de esta lista de reproducción?';
+  }
+
+  @override
+  String get deletePlaylistTitle => 'Eliminar lista de reproducción';
+
+  @override
+  String deletePlaylistMessage(String name) {
+    return '¿Estás seguro de que deseas eliminar \"$name\"? Esta acción no se puede deshacer.';
+  }
+
+  @override
+  String songRemovedFromPlaylist(String title) {
+    return 'Se eliminó \"$title\" de la lista';
+  }
+
+  @override
+  String playlistDeleted(String name) {
+    return 'Se eliminó la lista \"$name\"';
+  }
+
+  @override
+  String get deleteSongTooltip => 'Eliminar canción';
+
+  @override
+  String get deleteSongTitle => 'Eliminar canción';
+
+  @override
+  String deleteSongMessage(String title) {
+    return '¿Estás seguro de que deseas eliminar \"$title\" de tu biblioteca? También se quitará de todas las listas de reproducción.';
+  }
+
+  @override
+  String songDeleted(String title) {
+    return 'Se eliminó \"$title\" de la biblioteca';
+  }
 }

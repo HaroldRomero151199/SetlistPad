@@ -57,3 +57,5 @@ lib/features/songs/
    - `BilingualLyricsParser` preserves stanza breaks, line breaks, and alignment without desynchronizing verse order.
 4. **Bilingual Text Export**:
    - `LyricsExportService` generates clean alternating `.txt` files in local storage with sanitized filenames for easy reading and sharing.
+5. **Safety Confirmation for Song Deletion**:
+   - Deleting a song from `SongsScreen` requires confirmation via the shared `ConfirmDeleteDialog`, warning that it will also be removed from all playlists, and shows a `SnackBar` on completion.

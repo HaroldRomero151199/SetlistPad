@@ -58,5 +58,9 @@ lib/features/playlists/
      - **Error Handling & Non-corruption**: Failures to contact the remote playlist (private, unavailable, network error) leave the local playlist intact and display an informative error SnackBar.
      - **User Feedback**: Formatted via `PlaylistSyncHelper` (e.g. `+1 añadida, -1 removida`), showing descriptive diff metrics.
 
-3. **Persistence**:
+3. **Safety Confirmations for Destructive Actions**:
+   - Removing a song from a playlist (`PlaylistDetailScreen`) and deleting an entire playlist (`PlaylistDetailScreen` AppBar and `PlaylistsScreen` cards) both require explicit confirmation via `ConfirmDeleteDialog`.
+   - Confirming song removal displays a `SnackBar` with an **Undo** action to restore the song to the playlist; confirming playlist deletion displays a `SnackBar` confirmation.
+
+4. **Persistence**:
    - Manages CRUD operations via `HivePlaylistRepository` backed by the `playlistsBox` Hive storage box.

@@ -26,6 +26,37 @@ void main() {
         l10n.errorSingleVideoNotPlaylist,
         'This link is for a single song, not a playlist. You can import it from the Library tab.',
       );
+      expect(l10n.delete, 'Delete');
+      expect(l10n.undo, 'Undo');
+      expect(l10n.removeSongFromPlaylistTooltip, 'Remove song from playlist');
+      expect(l10n.removeSongFromPlaylistTitle, 'Remove Song from Playlist');
+      expect(
+        l10n.removeSongFromPlaylistMessage('Bohemian Rhapsody'),
+        'Are you sure you want to remove "Bohemian Rhapsody" from this playlist?',
+      );
+      expect(l10n.deletePlaylistTitle, 'Delete Playlist');
+      expect(
+        l10n.deletePlaylistMessage('Saturday Gig'),
+        'Are you sure you want to delete "Saturday Gig"? This action cannot be undone.',
+      );
+      expect(
+        l10n.songRemovedFromPlaylist('Bohemian Rhapsody'),
+        'Removed "Bohemian Rhapsody" from playlist',
+      );
+      expect(
+        l10n.playlistDeleted('Saturday Gig'),
+        'Deleted playlist "Saturday Gig"',
+      );
+      expect(l10n.deleteSongTooltip, 'Delete Song');
+      expect(l10n.deleteSongTitle, 'Delete Song');
+      expect(
+        l10n.deleteSongMessage('Bohemian Rhapsody'),
+        'Are you sure you want to delete "Bohemian Rhapsody" from your library? It will also be removed from all playlists.',
+      );
+      expect(
+        l10n.songDeleted('Bohemian Rhapsody'),
+        'Deleted "Bohemian Rhapsody" from library',
+      );
     });
 
     test('Spanish translations are loaded and correct', () async {
@@ -49,6 +80,37 @@ void main() {
       expect(
         l10n.errorSingleVideoNotPlaylist,
         'Este enlace es de una canción individual, no de una lista de reproducción. Puedes importarla desde la pestaña Biblioteca.',
+      );
+      expect(l10n.delete, 'Eliminar');
+      expect(l10n.undo, 'Deshacer');
+      expect(l10n.removeSongFromPlaylistTooltip, 'Eliminar canción de la lista');
+      expect(l10n.removeSongFromPlaylistTitle, 'Eliminar canción de la lista');
+      expect(
+        l10n.removeSongFromPlaylistMessage('Bohemian Rhapsody'),
+        '¿Estás seguro de que deseas eliminar "Bohemian Rhapsody" de esta lista de reproducción?',
+      );
+      expect(l10n.deletePlaylistTitle, 'Eliminar lista de reproducción');
+      expect(
+        l10n.deletePlaylistMessage('Concierto'),
+        '¿Estás seguro de que deseas eliminar "Concierto"? Esta acción no se puede deshacer.',
+      );
+      expect(
+        l10n.songRemovedFromPlaylist('Bohemian Rhapsody'),
+        'Se eliminó "Bohemian Rhapsody" de la lista',
+      );
+      expect(
+        l10n.playlistDeleted('Concierto'),
+        'Se eliminó la lista "Concierto"',
+      );
+      expect(l10n.deleteSongTooltip, 'Eliminar canción');
+      expect(l10n.deleteSongTitle, 'Eliminar canción');
+      expect(
+        l10n.deleteSongMessage('Bohemian Rhapsody'),
+        '¿Estás seguro de que deseas eliminar "Bohemian Rhapsody" de tu biblioteca? También se quitará de todas las listas de reproducción.',
+      );
+      expect(
+        l10n.songDeleted('Bohemian Rhapsody'),
+        'Se eliminó "Bohemian Rhapsody" de la biblioteca',
       );
     });
   });

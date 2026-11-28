@@ -12,5 +12,6 @@ export 'presentation/utils/playlist_sync_helper.dart';
 export 'presentation/views/import_playlist_preview_view.dart';
 export 'presentation/views/import_playlist_progress_view.dart';
 export 'presentation/views/import_playlist_url_view.dart';
+export '../../core/widgets/confirm_delete_dialog.dart';
 export 'presentation/widgets/import_playlist_dialog.dart';
 export 'presentation/widgets/import_playlist_track_tile.dart';

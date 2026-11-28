@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../domain/models/song_model.dart';
 import '../providers/songs_notifier.dart';
 import '../widgets/import_song_dialog.dart';
 import 'song_detail_screen.dart';
@@ -32,6 +34,30 @@ class _SongsScreenState extends ConsumerState<SongsScreen> {
       context: context,
       builder: (context) => const ImportSongDialog(),
     );
+  }
+
+  Future<void> _confirmDeleteSong(BuildContext context, Song song) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(songsNotifierProvider.notifier);
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context: context,
+      title: l10n.deleteSongTitle,
+      message: l10n.deleteSongMessage(song.title),
+      confirmLabel: l10n.delete,
+    );
+
+    if (!confirmed) return;
+
+    await notifier.deleteSong(song.id);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.songDeleted(song.title)),
+        ),
+      );
   }
 
   @override
@@ -157,11 +183,8 @@ class _SongsScreenState extends ConsumerState<SongsScreen> {
                             Icons.delete_outline,
                             color: context.colorScheme.onSurfaceVariant,
                           ),
-                          onPressed: () {
-                            ref
-                                .read(songsNotifierProvider.notifier)
-                                .deleteSong(song.id);
-                          },
+                          tooltip: context.l10n.deleteSongTooltip,
+                          onPressed: () => _confirmDeleteSong(context, song),
                         ),
                         onTap: () {
                           Navigator.of(context).push(

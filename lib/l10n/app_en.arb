@@ -401,6 +401,88 @@
   "exportFailed": "Failed to export file",
   "@exportFailed": {
     "description": "Notification when export fails"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Destructive delete confirmation button text"
+  },
+  "undo": "Undo",
+  "@undo": {
+    "description": "SnackBar action label to undo a recent action"
+  },
+  "removeSongFromPlaylistTooltip": "Remove song from playlist",
+  "@removeSongFromPlaylistTooltip": {
+    "description": "Tooltip for remove song button inside a playlist"
+  },
+  "removeSongFromPlaylistTitle": "Remove Song from Playlist",
+  "@removeSongFromPlaylistTitle": {
+    "description": "Dialog title when confirming removal of a song from a playlist"
+  },
+  "removeSongFromPlaylistMessage": "Are you sure you want to remove \"{title}\" from this playlist?",
+  "@removeSongFromPlaylistMessage": {
+    "description": "Confirmation message when removing a song from a playlist",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePlaylistTitle": "Delete Playlist",
+  "@deletePlaylistTitle": {
+    "description": "Dialog title when confirming deletion of an entire playlist"
+  },
+  "deletePlaylistMessage": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+  "@deletePlaylistMessage": {
+    "description": "Confirmation message when deleting a playlist",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "songRemovedFromPlaylist": "Removed \"{title}\" from playlist",
+  "@songRemovedFromPlaylist": {
+    "description": "SnackBar message after removing a song from a playlist",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistDeleted": "Deleted playlist \"{name}\"",
+  "@playlistDeleted": {
+    "description": "SnackBar message after deleting a playlist",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSongTooltip": "Delete Song",
+  "@deleteSongTooltip": {
+    "description": "Tooltip for delete song button in the Song Library"
+  },
+  "deleteSongTitle": "Delete Song",
+  "@deleteSongTitle": {
+    "description": "Dialog title when confirming permanent deletion of a song from the library"
+  },
+  "deleteSongMessage": "Are you sure you want to delete \"{title}\" from your library? It will also be removed from all playlists.",
+  "@deleteSongMessage": {
+    "description": "Confirmation message when deleting a song from the library",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "songDeleted": "Deleted \"{title}\" from library",
+  "@songDeleted": {
+    "description": "SnackBar message after deleting a song from the library",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
   }
 }
 

@@ -32,6 +32,12 @@ abstract final class AppTheme {
         onSurfaceVariant: textSecondary,
         error: errorColor,
         onError: Colors.black,
+        inversePrimary: primaryColor,
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: cardColor,
+        contentTextStyle: TextStyle(color: textPrimary),
+        actionTextColor: secondaryColor,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: surfaceColor,
